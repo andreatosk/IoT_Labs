@@ -9,7 +9,8 @@ class MQTTSubscriber():
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
-        self.topics=[]
+        self.__paths=[]
+        self.topics={}
 
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
@@ -46,6 +47,11 @@ class MQTTSubscriber():
         data=json.loads(r.content)
         self.broker=data['ip_address']
         self.port=data['port']
+        self.broker['endpoints']=data['endpoints']
+        #broker['endpoints']:
+        # - [0]:/devices
+        # - [1]:/users
+        # - [2]:/services
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
