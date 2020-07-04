@@ -10,6 +10,7 @@ class MQTTPublisher():
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
+        self.topics={}
 
         #registro al catalogo
         self._register()
@@ -48,8 +49,8 @@ class MQTTPublisher():
             #4xx o 5xx
         services=r.content
         for s_ID, service in services.items():
-            #NON DOVREBBERO ESSERE TUTTI I TOPIC
-            self.topics.extend(service['endpoints'])
+            #NON DOVREBBERO ESSERE TUTTI I TOPIC (?)
+            self.topics[service['description']]=service['endpoints']
 
     def start(self):
         self._mqtt.connect(self.broker, self.port)
