@@ -8,11 +8,13 @@ registered_devices_filename = 'devices.json'
 class DeviceManager(object):
 	exposed=True
 
-	def __init___(self):
+	def __init__(self):
 		global registered_devices, registered_devices_filename
-		registered_devices = json.load(registered_devices_filename)
-		self.exposed = True
-
+		try:
+			with open(registered_devices_filename, 'r') as file:
+				registered_devices = json.load(file)
+		except:
+			pass # JSON vuoti
 
 	def bad_request(recieved_json):
 		if len(recieved_json) != 4:
@@ -27,8 +29,8 @@ class DeviceManager(object):
 				return True, "Invalid resource(s)"
 		if not isinstance(recieved_json['insertion_timestamp'], str):
 			return True, '"insertion_timestamp" has to be a string'
-		global registered_services
-		if recieved_json['device_id'] in registered_services.keys():
+		global registered_devices
+		if recieved_json['device_id'] in registered_devices.keys():
 			return True, 'device_id already exists'
 		return False, ''
 

@@ -8,9 +8,13 @@ registered_services_filename = 'services.json'
 class ServiceManager(object):
 	exposed = True
 
-	def __init___(self):
+	def __init__(self):
 		global registered_services, registered_services_filename
-		registered_services = json.load(registered_services_filename)
+		try:
+			with open(registered_services_filename, 'r') as file:
+				registered_services = json.load(file)
+		except:
+			pass # JSON vuoti
 		self.exposed = True
 
 
@@ -51,7 +55,7 @@ class ServiceManager(object):
 		for endpoint in recieved_json['endpoints']:
 			new_service['endpoints'].append(endpoint)
 		new_service['insertion_timestamp'] = str(time.time())
-		registered_services[new_service['service-id']] = new_service
+		registered_services[new_service['service_id']] = new_service
 		
 		with open(registered_services_filename, 'w') as file:
 			json.dump(registered_services, file)
