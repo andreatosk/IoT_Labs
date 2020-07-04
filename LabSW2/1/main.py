@@ -17,6 +17,10 @@ class BrokerInfo(object):
 		data = {}
 		data['ip_address'] = IP_ADDRESS
 		data['port'] = PORT
+		data['endpoints'] = []
+		data['endpoints'].append('/devices')
+		data['endpoints'].append('/users')
+		data['endpoints'].append('/services')
 		data = json.dumps(data)
 		return data
 
