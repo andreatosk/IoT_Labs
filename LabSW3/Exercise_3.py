@@ -1,25 +1,23 @@
 import paho.mqtt.client as moquette
 import json
-import requests
 
-class MQTTSubscriber():
-    def __init__(self, ID, catalogURL):
-        self._ID=ID
-        self._description='subscriber'
-
+class MQTTPublisher():
+    def __init__(self, ID, catalog):
+        self.ID=ID
+        self.description="publisher"
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
 
+        # assumo che il led di default sia spento
+        self.__LED_ON=False
 
         #registro al catalogo
-        self._register()        
-
-        #ricavo le info sul broker
+        self._register()
+        # ottengo info dal catalogo:
         self._get_message_broker()
 
         #ottengo gli endpoints dal catalogo
         self._get_topics()
-        
 
         self.start()
 
@@ -47,20 +45,18 @@ class MQTTSubscriber():
         #get topics
         self.topics=topics
 
-
     def start(self):
         self._mqtt.connect(self.broker, self.port)
         self._mqtt.loop_start()
-        self.subscribe()
 
-    def subscribe(self):
-        tuples=[]
-        for topic in self.topics:
-            tuples.append((topic, 2))
-        self._mqtt.subscribe(tuples)
-
-
-    def on_message(self, client, userdata, msg):
-        data=json.loads(msg.payload)
-        print(f"Received data from {data['bn']}:")
-        print(f"{data['e']['n']}: {data['e']['v']:.3}{data['e']['u']}")
+    def switch_LED(self, state):
+        if type(state) != type(True):
+            #errore: il messaggio può essere solo booleano
+            pass
+        if state == self.__LED_ON:
+            #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
+            return
+        #Quale topic scelgo tra quelli validi dello Yùn?
+        topic=''
+        #PER IL DATAFORMAT DEVO CONOSCERE CHE COSA SI ASPETTA IL CLIENT MQTT SULLA YÙN
+        self._mqtt.publish(topic, ,2)
