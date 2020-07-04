@@ -32,6 +32,15 @@ class UserManager(object):
 			return True, "user_id already exists"
 		return False, ''
 
+	def format_new_user(recieved_json):
+		new_user = {}
+		new_user['user_id'] = recieved_json['user_id']
+		new_user['name'] = recieved_json['name']
+		new_user['surname'] = recieved_json['surname']
+		new_user['email'] = []
+		for email in recieved_json['email']:
+			new_user['email'].append(email)
+		return new_user
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -44,13 +53,7 @@ class UserManager(object):
 			cherrypy.response.status = 400
 			return response
 
-		new_user = {}
-		new_user['user_id'] = recieved_json['user_id']
-		new_user['name'] = recieved_json['name']
-		new_user['surname'] = recieved_json['surname']
-		new_user['email'] = []
-		for email in recieved_json['email']:
-			new_user['email'].append(email)
+		new_user = UserManager.format_new_user(recieved_json)
 
 		registered_users[new_user['user_id']] = new_user
 		with open(registered_users_filename, 'w') as file:

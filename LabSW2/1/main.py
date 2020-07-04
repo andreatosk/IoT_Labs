@@ -31,7 +31,7 @@ if __name__ == "__main__":
 		}
 	}
 	
-	cherrypy.tree.mount(BrokerInfo(), '/broker_info', conf)
+	cherrypy.tree.mount(BrokerInfo(), '/', conf)
 	cherrypy.tree.mount(DeviceManager.DeviceManager(), '/devices', conf)
 	cherrypy.tree.mount(ServiceManager.ServiceManager(), '/services', conf)
 	cherrypy.tree.mount(UserManager.UserManager(), '/users', conf)

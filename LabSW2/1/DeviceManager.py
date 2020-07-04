@@ -17,7 +17,7 @@ class DeviceManager(object):
 			pass # JSON vuoti
 
 	def bad_request(recieved_json):
-		if len(recieved_json) != 4:
+		if len(recieved_json) != 3:
 			return True, 'Incorrect number of arguments'
 		for argument in recieved_json:
 			if len(argument) < 1:
@@ -27,29 +27,45 @@ class DeviceManager(object):
 		for resource in recieved_json['resources']:
 			if len(resource) < 1:
 				return True, "Invalid resource(s)"
-		if not isinstance(recieved_json['insertion_timestamp'], str):
-			return True, '"insertion_timestamp" has to be a string'
-		global registered_devices
-		if recieved_json['device_id'] in registered_devices.keys():
-			return True, 'device_id already exists'
+		if not isinstance(recieved_json['endpoints'], list):
+			return True, '"endpoints" field has to be an array/list'
+		if len(recieved_json['endpoints']) != len(recieved_json['resources']):
+			return True, '"endpoints" and "resources" sizes must match'
 		return False, ''
 
+
+	def format_new_device(recieved_json):	
+		new_device = {}
+		new_device['device_id'] = recieved_json['device_id']
+		new_device['resources'] = []
+		for resource in recieved_json['resources']:
+			new_device['resources'].append(resource)
+		new_device['endpoints'] = []
+		for endpoint in recieved_json['endpoints']:
+			new_device['endpoints'].append(endpoint)
+		new_device['insertion_timestamp'] = str(time.time())
+		return new_device
+		
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
 	def PUT(self):
 		global registered_devices
 		recieved_json = cherrypy.request.json
-		new_device = {}
-		new_device['device_id'] = recieved_json['device_id']
-		new_device['resources'] = []
-		for resource in recievied_json['resources']:
-			new_device['resources'].append(resource)
-		new_device['insertion_timestamp'] = str(time.time())
-		
-		registered_devices[new_device['device_id']] = new_device
+
+		error, response = DeviceManager.bad_request(recieved_json)
+		if error is True:
+			cherrypy.response.status = 400
+			return response
+
+		if recieved_json['device_id'] not in registered_devices:
+			new_device = DeviceManager.format_new_device(recieved_json)
+			registered_devices[new_device['device_id']] = new_device
+		else:
+			registered_devices[recieved_json['device_id']]['insertion_timestamp'] = str(time.time())
+			
 		with open(registered_devices_filename, 'w') as file:
-			json.dump(registered_devices, registered_devices_filename)
+			json.dump(registered_devices, file)
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()

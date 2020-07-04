@@ -19,7 +19,7 @@ class ServiceManager(object):
 
 
 	def bad_request(recieved_json):
-		if len(recieved_json) != 4:
+		if len(recieved_json) != 3:
 			return True, 'Incorrect number of arguments'
 		for argument in recieved_json:
 			if len(argument) < 1:
@@ -29,13 +29,20 @@ class ServiceManager(object):
 		for endpoint in recieved_json['endpoints']:
 			if len(endpoint) < 1:
 				return True, "Invalid endpoint(s)"
-		if not isinstance(recieved_json['insertion_timestamp'], str):
-			return True, '"insertion_timestamp" has to be a string'
 		global registered_services
-		if recieved_json['service_id'] in registered_services.keys():
-			return True, 'service_id already exists'
 		return False, ''
 
+
+	def format_new_service(recieved_json):
+		new_service = {}
+		new_service['service_id'] = recieved_json['service_id']
+		new_service['description'] = recieved_json['description']
+		new_service['endpoints'] = []
+		for endpoint in recieved_json['endpoints']:
+			new_service['endpoints'].append(endpoint)
+		new_service['insertion_timestamp'] = str(time.time())
+
+		return new_service
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -48,15 +55,13 @@ class ServiceManager(object):
 			cherrypy.response.status = 400
 			return response
 
-		new_service = {}
-		new_service['service_id'] = recieved_json['service_id']
-		new_service['description'] = recieved_json['description']
-		new_service['endpoints'] = []
-		for endpoint in recieved_json['endpoints']:
-			new_service['endpoints'].append(endpoint)
-		new_service['insertion_timestamp'] = str(time.time())
-		registered_services[new_service['service_id']] = new_service
+		if recieved_json['service_id'] not in registered_services:
+			new_service = ServiceManager.format_new_service(recieved_json)
+			registered_services[recieved_json['service_id']] = new_service
+		else:
+			registered_services['service_id']['insertion_timestamp'] = str(time.time())
 		
+
 		with open(registered_services_filename, 'w') as file:
 			json.dump(registered_services, file)
 
