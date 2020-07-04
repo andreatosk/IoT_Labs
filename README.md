@@ -1,6 +1,6 @@
 # IoT_Labs
 Project structure:
-'''bash
+```bash
 ├───HW
 │   ├───Part1
 │   │   ├───Es1
@@ -35,4 +35,4 @@ Project structure:
             ├───freeboard
             ├───mqtt
             └───thirdparty
-'''
+```
