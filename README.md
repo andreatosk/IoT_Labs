@@ -1,5 +1,5 @@
 # IoT_Labs
-Project structure:
+First Lab structure:
 ```bash
 ├───HW
 │   ├───Part1
