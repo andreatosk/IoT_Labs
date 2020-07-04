@@ -6,6 +6,10 @@ class MQTTSubscriber():
     def __init__(self, ID, catalogURL):
         self._ID=ID
         self._description='subscriber'
+        self.catalogURL=catalogURL
+        self.broker=None
+        self.port=None
+        self.topics=[]
 
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
@@ -35,7 +39,7 @@ class MQTTSubscriber():
             pass
 
     def _get_message_broker(self):
-        r=requests.get(catalogURL)
+        r=requests.get(self.catalogURL)
         if not r:
             #vuol dire che è stato ritornato un errore 4xx o 5xx
             pass
@@ -44,8 +48,14 @@ class MQTTSubscriber():
         self.port=data['port']
 
     def _get_topics(self):
-        #get topics
-        self.topics=topics
+        #la post senza parametri mi ritorna tutti i services del catalogo
+        r=requests.post(self.catalogURL)
+        if not r:
+            #4xx o 5xx
+        services=r.content
+        for s_ID, service in services.items():
+            if service['description']=='temperature'
+                self.topics.extend(service['endpoints'])
 
 
     def start(self):
