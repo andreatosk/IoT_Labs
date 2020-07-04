@@ -2,11 +2,14 @@ import paho.mqtt.client as moquette
 import json
 
 class MQTTPublisher():
-    def __init__(self, ID, catalog):
+    def __init__(self, ID, catalogURL):
         self.ID=ID
         self.description="publisher"
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
+        self.catalogURL=catalogURL
+        self.broker=None
+        self.port=None
 
         # assumo che il led di default sia spento
         self.__LED_ON=False
@@ -42,8 +45,14 @@ class MQTTPublisher():
         self.port=data['port']
 
     def _get_topics(self):
-        #get topics
-        self.topics=topics
+        #la post senza parametri mi ritorna tutti i services del catalogo
+        r=requests.post(self.catalogURL)
+        if not r:
+            #4xx o 5xx
+        services=r.content
+        for s_ID, service in services.items():
+            if service['description']=='led'
+                self.topics.extend(service['endpoints'])
 
     def start(self):
         self._mqtt.connect(self.broker, self.port)
@@ -59,4 +68,4 @@ class MQTTPublisher():
         #Quale topic scelgo tra quelli validi dello Yùn?
         topic=''
         #PER IL DATAFORMAT DEVO CONOSCERE CHE COSA SI ASPETTA IL CLIENT MQTT SULLA YÙN
-        self._mqtt.publish(topic, ,2)
+        self._mqtt.publish(topic, data,2)
