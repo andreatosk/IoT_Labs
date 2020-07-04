@@ -2,14 +2,16 @@ import cherrypy
 import json
 import time
 
-regiseterd_services = {}
+registered_services = {}
 registered_services_filename = 'services.json'
 
 class ServiceManager(object):
+	exposed = True
 
 	def __init___(self):
 		global registered_services, registered_services_filename
 		registered_services = json.load(registered_services_filename)
+		self.exposed = True
 
 
 	def bad_request(recieved_json):
@@ -37,7 +39,7 @@ class ServiceManager(object):
 		global registered_services
 		recieved_json = cherrypy.request.json
 
-		error, response = bad_request(recieved_json)
+		error, response = ServiceManager.bad_request(recieved_json)
 		if error is True:
 			cherrypy.response.status = 400
 			return response
@@ -47,14 +49,16 @@ class ServiceManager(object):
 		new_service['description'] = recieved_json['description']
 		new_service['endpoints'] = []
 		for endpoint in recieved_json['endpoints']:
-			with new_service['endpoints'] as endpoints:
-				endpoints.append(recieved_json[endpoints])
+			new_service['endpoints'].append(endpoint)
 		new_service['insertion_timestamp'] = str(time.time())
-		json.dump(registered_services, registered_services_filename)
+		registered_services[new_service['service-id']] = new_service
+		
+		with open(registered_services_filename, 'w') as file:
+			json.dump(registered_services, file)
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
-	def GET(self):
+	def POST(self):
 		# Se 'service_id' è vuoto, ritorna tutto
 		# Se 'service_id' contiene un id, ritorna quello
 		global registered_services
@@ -63,15 +67,7 @@ class ServiceManager(object):
 		if request == '':
 			return json.dumps(registered_services)
 		else:
-			return json.dumps(registered_services[request])
-
-	@cherrypy.expose
-	def POST(self):
-		cherrypy.response.status = 403
-		return "Error"
-
-	@cherrypy.expose
-	def DELETE(self):
-		cherrypy.response.status = 403
-		return "Error"
-	
+			try:
+				return json.dumps(registered_services[request])
+			except:
+				return json.dumps({})

@@ -6,11 +6,12 @@ registered_devices = {}
 registered_devices_filename = 'devices.json'
 
 class DeviceManager(object):
-	
+	exposed=True
 
 	def __init___(self):
 		global registered_devices, registered_devices_filename
 		registered_devices = json.load(registered_devices_filename)
+		self.exposed = True
 
 
 	def bad_request(recieved_json):
@@ -41,15 +42,16 @@ class DeviceManager(object):
 		new_device['device_id'] = recieved_json['device_id']
 		new_device['resources'] = []
 		for resource in recievied_json['resources']:
-			with new_device['resources'] as resources:
-				resources.append(recievied_json[resource])
+			new_device['resources'].append(resource)
 		new_device['insertion_timestamp'] = str(time.time())
-		registered_devices['device_id'] = new_device
-		json.dump(registered_devices, registered_devices_filename)
+		
+		registered_devices[new_device['device_id']] = new_device
+		with open(registered_devices_filename, 'w') as file:
+			json.dump(registered_devices, registered_devices_filename)
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
-	def GET(self):
+	def POST(self):
 		# Se 'device_id' è vuoto, ritorna tutto
 		# Se 'device_id' contiene un id, ritorna quello
 		global registered_devices
@@ -58,15 +60,7 @@ class DeviceManager(object):
 		if request == '':
 			return json.dumps(registered_devices)
 		else:
-			return json.dumps(registered_devices[request])
-
-	@cherrypy.expose
-	def POST(self):
-		cherrypy.response.status = 403
-		return "Error"
-
-	@cherrypy.expose
-	def DELETE(self):
-		cherrypy.response.status = 403
-		return "Error"
-	
+			try:
+				return json.dumps(registered_devices[request])
+			except:
+				return json.dumps({})
