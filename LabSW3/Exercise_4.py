@@ -11,9 +11,6 @@ class MQTTPublisher():
         self.broker=None
         self.port=None
 
-        # assumo che il led di default sia spento
-        self.__LED_ON=False
-
         #registro al catalogo
         self._register()
         # ottengo info dal catalogo:
@@ -51,21 +48,27 @@ class MQTTPublisher():
             #4xx o 5xx
         services=r.content
         for s_ID, service in services.items():
-            if service['description']=='led'
-                self.topics.extend(service['endpoints'])
+            #NON DOVREBBERO ESSERE TUTTI I TOPIC
+            self.topics.extend(service['endpoints'])
 
     def start(self):
         self._mqtt.connect(self.broker, self.port)
         self._mqtt.loop_start()
 
-    def switch_LED(self, state):
-        if type(state) != type(True):
-            #errore: il messaggio può essere solo booleano
-            pass
-        if state == self.__LED_ON:
-            #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
-            return
-        #Quale topic scelgo tra quelli validi dello Yùn?
-        topic=''
-        #PER IL DATAFORMAT DEVO CONOSCERE CHE COSA SI ASPETTA IL CLIENT MQTT SULLA YÙN
-        self._mqtt.publish(topic, data,2)
+    def actuate_fan(self):
+        pass
+
+    def actuate_led(self):
+        pass
+
+    def sense_people(self):
+        #riceve info da PIR e noise
+        pass
+
+    #punti 3 e 4 implementati nel 5
+    #punto 6 non necessario
+
+    def change_set_points(self, min_fan=None, max_fan=None, min_led=None, max_led=None):
+        #cambia solo i setpoint effettivamente ricevuti
+        #NB: PASSARE I PARAMETRI NELLA FORMA KEY=VALUE
+        pass
