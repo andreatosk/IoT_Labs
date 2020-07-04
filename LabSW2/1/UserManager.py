@@ -8,10 +8,13 @@ registered_users_filename = 'users.json'
 class UserManager(object):
 	exposed=True
 	
-	def __init___(self):
+	def __init__(self):
 		global registered_users, registered_users_filename
-		registered_users = json.load(registered_users_filename)
-		self.exposed = True
+		try:
+			with open(registered_users_filename, 'r') as file:
+				registered_users = json.load(file)
+		except:
+			pass # JSON vuoti
 
 	def bad_request(recieved_json):
 		if len(recieved_json) != 4:
@@ -21,7 +24,7 @@ class UserManager(object):
 				return True, 'Invalid arguments'
 		if not isinstance(recieved_json['email'], list):
 			return True, '"email" field has to be an array/list'
-		for email in recieved_json['emails']:
+		for email in recieved_json['email']:
 			if len(email) < 1:
 				return True, 'Invalid email(s)'
 		global registered_users
