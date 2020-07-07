@@ -16,21 +16,36 @@ class DeviceManager(object):
 		except:
 			pass # JSON vuoti
 
+# Questa funzione implementa alcuni controlli basilari sul JSON ricevuto
 	def bad_request(recieved_json):
 		if len(recieved_json) != 3:
 			return True, 'Incorrect number of arguments'
+
 		for argument in recieved_json:
 			if len(argument) < 1:
 				return True, 'Invalid arguments'
-		if not isinstance(recieved_json['resources'], list):
-			return True, '"resources" field has to be an array/list'
-		for resource in recieved_json['resources']:
-			if len(resource) < 1:
-				return True, "Invalid resource(s)"
-		if not isinstance(recieved_json['endpoints'], list):
-			return True, '"endpoints" field has to be an array/list'
-		if len(recieved_json['endpoints']) != len(recieved_json['resources']):
-			return True, '"endpoints" and "resources" sizes must match'
+		try:		
+			if not isinstance(recieved_json['resources'], list):
+				return True, '"resources" field has to be an array/list'
+			for resource in recieved_json['resources']:
+				if len(resource) < 1:
+					return True, "Invalid resource(s)"
+		except:
+			return True, 'Missing "resources" field'
+
+		try:
+			if not isinstance(recieved_json['endpoints'], list):
+				return True, '"endpoints" field has to be an array/list'
+			if len(recieved_json['endpoints']) != len(recieved_json['resources']):
+				return True, '"endpoints" and "resources" sizes must match'
+		except:
+			return True, 'Missing "endpoints" field'
+
+		try:
+			test = recieved_json['device_id']
+		except:
+			return True, 'Missing "device_id" field'
+
 		return False, ''
 
 
@@ -58,7 +73,7 @@ class DeviceManager(object):
 			cherrypy.response.status = 400
 			return response
 
-		if recieved_json['device_id'] not in registered_devices:
+		if recieved_json['device_id'] not in registered_devices.keys():
 			new_device = DeviceManager.format_new_device(recieved_json)
 			registered_devices[new_device['device_id']] = new_device
 		else:

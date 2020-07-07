@@ -15,21 +15,30 @@ class ServiceManager(object):
 				registered_services = json.load(file)
 		except:
 			pass # JSON vuoti
-		self.exposed = True
 
-
+# Questa funzione implementa alcuni controlli basilari sul JSON ricevuto
 	def bad_request(recieved_json):
 		if len(recieved_json) != 3:
 			return True, 'Incorrect number of arguments'
+
 		for argument in recieved_json:
 			if len(argument) < 1:
 				return True, 'Invalid arguments'
-		if not isinstance(recieved_json['endpoints'], list):
-			return True, '"endpoints" field has to be an array/list'
-		for endpoint in recieved_json['endpoints']:
-			if len(endpoint) < 1:
-				return True, "Invalid endpoint(s)"
-		global registered_services
+
+		try:
+			if not isinstance(recieved_json['endpoints'], list):
+				return True, '"endpoints" field has to be an array/list'
+			for endpoint in recieved_json['endpoints']:
+				if len(endpoint) < 1:
+					return True, "Invalid endpoint(s)"
+		except:
+			return True, 'Missing "endpoints field'
+
+		try:
+			test = recieved_json['service_id']
+		except:
+			return True, 'Missing "service_id" field'
+
 		return False, ''
 
 
@@ -55,7 +64,7 @@ class ServiceManager(object):
 			cherrypy.response.status = 400
 			return response
 
-		if recieved_json['service_id'] not in registered_services:
+		if recieved_json['service_id'] not in registered_services.keys():
 			new_service = ServiceManager.format_new_service(recieved_json)
 			registered_services[recieved_json['service_id']] = new_service
 		else:
@@ -72,11 +81,13 @@ class ServiceManager(object):
 		# Se 'service_id' contiene un id, ritorna quello
 		global registered_services
 		recievied_json = cherrypy.request.json
-		request = recievied_json['service_id']
+
+		try:
+			request = recievied_json['service_id']
+		except:
+			return 'Missing "service_id" field'
+
 		if request == '':
 			return json.dumps(registered_services)
 		else:
-			try:
-				return json.dumps(registered_services[request])
-			except:
-				return json.dumps({})
+			return json.dumps(registered_services[request])
