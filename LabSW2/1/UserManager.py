@@ -55,9 +55,8 @@ class UserManager(object):
 			return response
 
 		registered_users[recieved_json['user_id']] = recieved_json  
-		with open(registered_users_filename, 'w') as file:
-			json.dump(registered_users, file)
-		# Sarebbe carino trovare il modo di poter operare in 'append' senza dover riscrivere l'intero file
+
+		UserManager.write_to_local()
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -77,3 +76,8 @@ class UserManager(object):
 			return json.dumps(registered_users)
 		else:
 			return json.dumps(registered_users[request])
+
+	def write_to_local():
+		global registered_users
+		with open(registered_users_filename, 'w') as file:
+			json.dump(registered_users, file)

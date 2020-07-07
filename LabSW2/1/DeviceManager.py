@@ -79,8 +79,7 @@ class DeviceManager(object):
 		else:
 			registered_devices[recieved_json['device_id']]['insertion_timestamp'] = str(time.time())
 			
-		with open(registered_devices_filename, 'w') as file:
-			json.dump(registered_devices, file)
+		DeviceManager.write_to_local()
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -97,3 +96,8 @@ class DeviceManager(object):
 				return json.dumps(registered_devices[request])
 			except:
 				return json.dumps({})
+
+	def write_to_local():
+		global registered_devices
+		with open(registered_devices_filename, 'w') as file:
+			json.dump(registered_devices, file)

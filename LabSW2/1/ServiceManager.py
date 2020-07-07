@@ -69,10 +69,9 @@ class ServiceManager(object):
 			registered_services[recieved_json['service_id']] = new_service
 		else:
 			registered_services['service_id']['insertion_timestamp'] = str(time.time())
-		
 
-		with open(registered_services_filename, 'w') as file:
-			json.dump(registered_services, file)
+		ServiceManager.write_to_local()
+
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -91,3 +90,10 @@ class ServiceManager(object):
 			return json.dumps(registered_services)
 		else:
 			return json.dumps(registered_services[request])
+
+
+	def write_to_local():
+		global registered_services
+		with open(registered_services_filename, 'w') as file:
+			json.dump(registered_services, file)
+
