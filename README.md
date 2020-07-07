@@ -50,17 +50,17 @@ Devices
 {
     "device_id_one" : {
      "device_id" : "device_id_one",
-      "resources" : ["resource_one", "resource_two', ...],
-      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "resources" : ["resource_one", "resource_two", "other_resources"],
+      "endpoints" : ["endpoint_one", "endpoint_two", "other_resources"],
       "insertion_timestamp" : "seconds_since_epoch"
     },
     "device_id_two":{
      "device_id" : "device_id_two",
-      "resources" : ["resource_one", "resource_two", ...],
-      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "resources" : ["resource_one", "resource_two", "other_resources"],
+      "endpoints" : ["endpoint_one", "endpoint_two", "other_endpoints"],
       "insertion_timestamp" : "seconds_since_epoch"
     },
-    ...
+    "other_devices_ids"
 }
 ```
 Services
@@ -69,16 +69,16 @@ Services
     "service_id_one" : { 
      "service_id" : "service_id_one",
       "description" : "This is a description",
-      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "endpoints" : ["endpoint_one", "endpoint_two", "other_endpoints"],
       "insertion_timestamp" : "seconds_since_epoch"
     },
     "service_id_two" : { 
      "service_id" : "service_id_two",
       "description" : "This is a description",
-      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "endpoints" : ["endpoint_one", "endpoint_two", "other_endpoints"],
       "insertion_timestamp" : "seconds_since_epoch"
     },
-    ...
+    "other_services_ids"
 }
 ```
 
@@ -89,15 +89,15 @@ Users
       "user_id" : "user_id_one",
       "name" : "John",
       "surname" : "Doe",
-      "email" : ["email_one", "email_two", ...]
+      "email" : ["email_one", "email_two", "other_emails"]
     },
     "user_id_two" : {
       "user_id" : "user_id_two",
       "name" : "Doe",
       "surname" : "John",
-      "email" : ["email_one", "email_two", ...]
+      "email" : ["email_one", "email_two", "other_emails"]
     },
-    ...
+    "other_users_ids"
     
 }
 ```
