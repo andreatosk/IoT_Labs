@@ -46,24 +46,28 @@ Current Lab structure:
 
 # JSON Templates:
 Devices
-
+```json
 {
     "device_id" : {
         "device_id" : "device_id",
    }
 }
-
+```
 Services
+```json
 {
     "service_id": "",
     "description": "",
     "endpoints": []
 }
+```
 
 Users
+```json
 {
     "user_id": "",
     "name": "",
     "surname":"",
     "email": []
 }
+```
