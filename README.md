@@ -54,7 +54,7 @@ Devices
       "endpoints":[],
       "insertion_timestamp":"milliseconds"
    
-},
+    }
 }
 ```
 Services
@@ -66,7 +66,7 @@ Services
       "endpoints":[],
       "insertion_timestamp":"milliseconds"
    
-},
+    }
 }
 ```
 
