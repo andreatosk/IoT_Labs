@@ -48,37 +48,56 @@ Current Lab structure:
 Devices
 ```json
 {
-    "device 1":{
-     "device_id":"device 1",
-      "resources":[],
-      "endpoints":[],
-      "insertion_timestamp":"milliseconds"
-   
-    }
+    "device_id_one" : {
+     "device_id" : "device_id_one",
+      "resources" : ["resource_one", "resource_two', ...],
+      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "insertion_timestamp" : "seconds_since_epoch"
+    },
+    "device_id_two":{
+     "device_id" : "device_id_two",
+      "resources" : ["resource_one", "resource_two", ...],
+      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "insertion_timestamp" : "seconds_since_epoch"
+    },
+    ...
 }
 ```
 Services
 ```json
 {
-    "service 1":{ 
-     "service_id":"service 1",
-      "description":"This is a description",
-      "endpoints":[],
-      "insertion_timestamp":"milliseconds"
-   
-    }
+    "service_id_one" : { 
+     "service_id" : "service_id_one",
+      "description" : "This is a description",
+      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "insertion_timestamp" : "seconds_since_epoch"
+    },
+    "service_id_two" : { 
+     "service_id" : "service_id_two",
+      "description" : "This is a description",
+      "endpoints" : ["endpoint_one", "endpoint_two", ...],
+      "insertion_timestamp" : "seconds_since_epoch"
+    },
+    ...
 }
 ```
 
 Users
 ```json
 {
-    "user 1":{
-      "user_id":"user 1",
-      "name":"John",
-      "surname":"Doe",
-      "email":[]
-   
-    }
+    "user_id_one" : {
+      "user_id" : "user_id_one",
+      "name" : "John",
+      "surname" : "Doe",
+      "email" : ["email_one", "email_two", ...]
+    },
+    "user_id_two" : {
+      "user_id" : "user_id_two",
+      "name" : "Doe",
+      "surname" : "John",
+      "email" : ["email_one", "email_two", ...]
+    },
+    ...
+    
 }
 ```
