@@ -31,9 +31,11 @@ class MQTTPublisher():
 
     def _register(self):
         myself={}
-        myself['service_id']=self.ID
-        myself['description']=self._description
-        myself['endpoints']=[]
+        jdict={}
+        jdict['service_id']=self.ID
+        jdict['description']=self._description
+        jdict['endpoints']=[]
+        myself[self.ID]=jdict
 
         r=requests.put(catalogURL, json.dumps(myself))
         if not r:
