@@ -15,44 +15,57 @@ class MQTTPublisher():
         self.__LED_ON=False
 
         #registro al catalogo
-        self._register()
-        # ottengo info dal catalogo:
-        self._get_message_broker()
+        success=self._register()
 
+        if not success:
+            return("Failed to register to catalog.")
+        # ottengo info dal catalogo:
+        success=self._get_message_broker()
+
+        if not success:
+            return("Failed to retrieve Message Broker info.")
         #ottengo gli endpoints dal catalogo
-        self._get_topics()
+        success=self._get_topics()
+        if not success:
+            return("Failed to retrieve endpoints.")
 
         self.start()
 
     def _register(self):
         myself={}
-        myself['service_id']=self.ID
-        myself['description']=self._description
-        myself['endpoints']=[]
+        jdict={}
+        jdict['service_id']=self.ID
+        jdict['description']=self._description
+        jdict['endpoints']=[]
+        myself[self.ID]=jdict
 
         r=requests.put(catalogURL, json.dumps(myself))
         if not r:
             #4xx o 5xx
-            pass
+            return False
+        return True
 
     def _get_message_broker(self):
         r=requests.get(catalogURL)
         if not r:
             #vuol dire che è stato ritornato un errore 4xx o 5xx
-            pass
+            return False
         data=json.loads(r.content)
         self.broker=data['ip_address']
         self.port=data['port']
+        return True
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
         r=requests.post(self.catalogURL)
         if not r:
             #4xx o 5xx
+            return False
         services=r.content
         for s_ID, service in services.items():
             if service['description']=='led'
                 self.topics.extend(service['endpoints'])
+        return True
 
     def start(self):
         self._mqtt.connect(self.broker, self.port)
