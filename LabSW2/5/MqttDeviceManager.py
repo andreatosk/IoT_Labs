@@ -1,22 +1,11 @@
 import json
 import time
 import paho.mqtt.client as mqtt
-import DeviceManager
 
-registered_devices = {}
-registered_devices_filename = 'devices.json' # Dovrebbe cooperare con le API Rest? Errori di divergenza dei dati?
+from DeviceManager import DeviceManager
 
 class MqttDeviceManager(object):
-	exposed=True
-
 	def __init__(self, client_id):
-		global registered_devices, registered_devices_filename
-		try:
-			with open(registered_devices_filename, 'r') as file:
-				registered_devices = json.load(file)
-		except:
-			pass # JSON vuoti
-
 		self.client_id = client_id
 		self.topic = '/mqtt/devices/'
 		self.broker = 'test.mosquitto.org'
@@ -37,13 +26,6 @@ class MqttDeviceManager(object):
 		if error is True:
 			print(response)
 			return
-		if recieved_json['device_id'] not in registered_devices.keys():
-			new_device = DeviceManager.format_new_device(recieved_json)
-			registered_devices[new_device['device_id']] = new_device
-		else:
-			registered_devices[recieved_json['device_id']]['insertion_timestamp'] = str(time.time())
-
-			
 		DeviceManager.add_from_mqtt(recieved_json)
 
 	def on_subscribe(self, client, userdata, mid, granted_qos):
