@@ -6,13 +6,14 @@ registered_users = {}
 registered_users_filename = 'users.json'
 
 class UserManager(object):
-	exposed=True
+	exposed = True
 	
 	def __init__(self):
 		global registered_users, registered_users_filename
 		try:
 			with open(registered_users_filename, 'r') as file:
 				registered_users = json.load(file)
+				file.close()
 		except:
 			pass # JSON vuoti
 
@@ -81,3 +82,4 @@ class UserManager(object):
 		global registered_users
 		with open(registered_users_filename, 'w') as file:
 			json.dump(registered_users, file)
+			file.close()

@@ -4,6 +4,7 @@ import json
 import DeviceManager
 import UserManager
 import ServiceManager
+import Cleaner
 
 IP_ADDRESS = "0.0.0.0"
 PORT = 8080
@@ -41,5 +42,6 @@ if __name__ == "__main__":
 		'server.socket_port' : PORT
 		})
 
+	Cleaner.Cleaner()
 	cherrypy.engine.start()
 	cherrypy.engine.block()
