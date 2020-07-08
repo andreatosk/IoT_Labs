@@ -93,7 +93,10 @@ class ServiceManager(object):
 		if request == '':
 			return json.dumps(registered_services)
 		else:
-			return json.dumps(registered_services[request])
+			try:
+				return json.dumps(registered_services[request])
+			except:
+				return '"service_id" not found'
 
 
 	def write_to_local():

@@ -93,14 +93,19 @@ class DeviceManager(object):
 		# Se 'device_id' contiene un id, ritorna quello
 		global registered_devices
 		recievied_json = cherrypy.request.json
-		request = recievied_json['device_id']
+		try:
+			request = recievied_json['device_id']
+		except:
+			return 'Missing "device_id" field'
+
+
 		if request == '':
 			return json.dumps(registered_devices)
 		else:
 			try:
 				return json.dumps(registered_devices[request])
 			except:
-				return json.dumps({})
+				return '"device_id" not found'
 
 	def write_to_local():
 		global registered_devices
@@ -114,14 +119,10 @@ class DeviceManager(object):
 		global registered_devices
 		global registered_devices_filename
 		DeviceManager.get_memory_access()
-
-		if recieved_json['device_id'] not in registered_devices.keys():
-			new_device = DeviceManager.format_new_device(recieved_json)
-			registered_devices[new_device['device_id']] = new_device
-		else:
-			registered_devices[recieved_json['device_id']]['insertion_timestamp'] = str(time.time())
+		DeviceManager.get_file_access()
+		registered_devices[recieved_json['device_id']] = recieved_json
 		DeviceManager.write_to_local()
-
+		DeviceManager.unlock_file()
 		DeviceManager.unlock_memory()
 
 
@@ -136,12 +137,12 @@ class DeviceManager(object):
 
 	def get_memory_access():
 		while DeviceManager.get_memory_status() is True:
-			print('Waiting for file...')
+			pass
 		DeviceManager.lock_memory()
 
 	def get_file_access():
 		while DeviceManager.get_file_status() is True:
-			print('Waiting for memory...')
+			pass
 		DeviceManager.lock_file()
 
 	def lock_file():
