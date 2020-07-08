@@ -76,6 +76,9 @@ void setup() {
 void loop() {
     float temp = calcTemp();
     String data = sendMlEncode(temp);
-    my_curl(data, "http://<hostname>:<port>/log");
+    int exval = my_curl(data, "http://<hostname>:<port>/log");
+    Serial.print("Curl exitval : ")
+    Serial.println(exval)
+    
     delay(1000);
 }
