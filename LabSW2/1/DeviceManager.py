@@ -110,6 +110,17 @@ class DeviceManager(object):
 			file.close()
 		DeviceManager.unlock_file()
 
+	def add_from_mqtt(recieved_json):
+		global registered_devices
+		global registered_devices_filename
+		self.get_memory_access()
+		self.get_file_access()
+		registered_devices[recieved_json['device_id']] = recieved_json
+		self.write_to_local()
+		self.unlock_file()
+		self.unlock_memory()
+
+
 	def get_memory_status():
 		return self.memory_locked
 
