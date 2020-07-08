@@ -19,7 +19,7 @@ def chat_id(update):
 
 def devices(update, context):
 	arguments = context.args
-	chat_id = update.chat_id()
+	chat_id = chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'devices'
 	request_json = {}
@@ -55,7 +55,7 @@ def devices(update, context):
 
 def users(update, context):
 	arguments = context.args
-	chat_id = update.chat_id()
+	chat_id = chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'users'
 	request_json = {}
@@ -92,7 +92,7 @@ def users(update, context):
 
 def services(update, context):
 	arguments = context.args
-	chat_id = update.chat_id()
+	chat_id = chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'services'
 	request_json = {}
@@ -128,7 +128,7 @@ def services(update, context):
 
 
 def help(update, context):
-	chat_id = update.chat_id()
+	chat_id = chat_id(update)
 	bot = context.bot
 
 	msg = '/help' + '\n'
