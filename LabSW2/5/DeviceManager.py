@@ -6,13 +6,16 @@ registered_devices = {}
 registered_devices_filename = 'devices.json'
 
 class DeviceManager(object):
-	exposed=True
+	exposed = True
+	file_locked = False
+	memory_locked = False
 
 	def __init__(self):
 		global registered_devices, registered_devices_filename
 		try:
 			with open(registered_devices_filename, 'r') as file:
 				registered_devices = json.load(file)
+				file.close()
 		except:
 			pass # JSON vuoti
 
@@ -68,17 +71,19 @@ class DeviceManager(object):
 		global registered_devices
 		recieved_json = cherrypy.request.json
 
+
 		error, response = DeviceManager.bad_request(recieved_json)
 		if error is True:
 			cherrypy.response.status = 400
 			return response
 
+		DeviceManager.get_memory_access()
 		if recieved_json['device_id'] not in registered_devices.keys():
 			new_device = DeviceManager.format_new_device(recieved_json)
 			registered_devices[new_device['device_id']] = new_device
 		else:
 			registered_devices[recieved_json['device_id']]['insertion_timestamp'] = str(time.time())
-			
+		DeviceManager.unlock_memory()
 		DeviceManager.write_to_local()
 
 	@cherrypy.expose
@@ -99,5 +104,48 @@ class DeviceManager(object):
 
 	def write_to_local():
 		global registered_devices
+		DeviceManager.get_file_access()
 		with open(registered_devices_filename, 'w') as file:
 			json.dump(registered_devices, file)
+			file.close()
+		DeviceManager.unlock_file()
+
+	def get_memory_status():
+		return self.memory_locked
+
+	def get_file_status():
+		return self.file_locked
+
+	def lock_memory():
+		self.memory_locked = True
+
+	def get_memory_access():
+		while self.get_memory_status() is True:
+			pass
+		self.lock_memory()
+
+	def get_file_access():
+		while self.get_file_status() is True:
+			pass
+		self.lock_file()
+
+	def lock_file():
+		self.file_locked = True
+
+	def unlock_file():
+		self.file_locked = False
+
+	def unlock_memory():
+		self.memory_locked = False
+
+	def get_mem_json():
+		global registered_devices
+		return registered_devices
+
+	def get_filename():
+		global registered_devices_filename
+		return registered_devices_filename
+
+	def set_mem_json(json):
+		global registered_devices
+		registered_devices = json
