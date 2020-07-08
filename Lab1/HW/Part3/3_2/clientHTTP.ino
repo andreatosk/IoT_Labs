@@ -11,6 +11,8 @@ const int timestamp = 10;
 
 const int B=4275;                 // B value of the thermistor
 const long int R0 = 100000;      // R0 = 100k
+unsigned long first;
+unsigned long second;
 
 DynamicJsonDocument doc_snd(capacity);
 BridgeServer server;
@@ -67,8 +69,7 @@ void setup() {
   Bridge.begin();
   digitalWrite(ledPin, HIGH);
 
-  //server.listenOnLocalhost();
-
+  first = millis();
 
 }
 
