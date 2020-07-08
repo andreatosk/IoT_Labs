@@ -28,6 +28,10 @@ def devices(update, context):
 		request_json['device_id'] = ''
 		response = requests.post(endpoint, json=request_json)
 		response_json = response.json()
+		if response.status_code != 200:
+			msg = 'Something went wrong processing your request.'
+			bot.send_message(chat_id=chat_id, msg=msg)
+			return
 
 		msg = 'Device IDs:\n'
 		for device_id in response_json.keys():
@@ -40,6 +44,10 @@ def devices(update, context):
 			response = requests.post(endpoint, json=request_json)
 			try:
 				response_json = response.json()
+				if response.status_code != 200:
+					msg = 'Something went wrong processing your request.'
+					bot.send_message(chat_id=chat_id, msg=msg)
+					return
 				msg += str(response_json)
 			except:
 				msg += device_id + " not found.\n"
@@ -56,6 +64,10 @@ def users(update, context):
 		request_json['user_id'] = ''
 		response = requests.post(endpoint, json=request_json)
 		response_json = response.json()
+		if response.status_code != 200:
+			msg = 'Something went wrong processing your request.'
+			bot.send_message(chat_id=chat_id, msg=msg)
+			return
 
 		msg = 'Device IDs:\n'
 		for user_id in response_json.keys():
@@ -68,6 +80,10 @@ def users(update, context):
 			response = requests.post(endpoint, json=request_json)
 			try:
 				response_json = response.json()
+				if response.status_code != 200:
+					msg = 'Something went wrong processing your request.'
+					bot.send_message(chat_id=chat_id, msg=msg)
+					return
 				msg += str(response_json)
 			except:
 				msg += user_id + " not found.\n"
@@ -85,6 +101,10 @@ def services(update, context):
 		request_json['service_id'] = ''
 		response = requests.post(endpoint, json=request_json)
 		response_json = response.json()
+		if response.status_code != 200:
+			msg = 'Something went wrong processing your request.'
+			bot.send_message(chat_id=chat_id, msg=msg)
+			return
 
 		msg = 'Device IDs:\n'
 		for service_id in response_json.keys():
@@ -97,6 +117,10 @@ def services(update, context):
 			response = requests.post(endpoint, json=request_json)
 			try:
 				response_json = response.json()
+				if response.status_code != 200:
+					msg = 'Something went wrong processing your request.'
+					bot.send_message(chat_id=chat_id, msg=msg)
+					return
 				msg += str(response_json)
 			except:
 				msg += service_id + " not found.\n"
