@@ -93,14 +93,19 @@ class DeviceManager(object):
 		# Se 'device_id' contiene un id, ritorna quello
 		global registered_devices
 		recievied_json = cherrypy.request.json
-		request = recievied_json['device_id']
+		try:
+			request = recievied_json['device_id']
+		except:
+			return 'Missing "device_id" field'
+
+
 		if request == '':
 			return json.dumps(registered_devices)
 		else:
 			try:
 				return json.dumps(registered_devices[request])
 			except:
-				return json.dumps({})
+				return '"device_id" not found'
 
 	def write_to_local():
 		global registered_devices
