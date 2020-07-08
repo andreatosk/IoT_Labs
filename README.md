@@ -98,6 +98,5 @@ Users
       "email" : ["email_one", "email_two", "other_emails"]
     },
     "other_users_ids"
-    
 }
 ```
