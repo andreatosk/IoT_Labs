@@ -21,7 +21,7 @@ def devices(update, context):
 	arguments = context.args
 	chat_id = update.chat_id()
 	bot = context.bot
-	endpoint = address + 'devices'
+	endpoint = catalog_address + 'devices'
 	request_json = {}
 
 	if len(arguments) == 0:
@@ -33,7 +33,7 @@ def devices(update, context):
 			bot.send_message(chat_id=chat_id, msg=msg)
 			return
 
-		msg = 'Device IDs:\n'
+		msg = 'Devices IDs:\n'
 		for device_id in response_json.keys():
 			msg += device_id + '\n'
 		bot.send_message(chat_id=chat_id, msg=msg)
@@ -57,7 +57,7 @@ def users(update, context):
 	arguments = context.args
 	chat_id = update.chat_id()
 	bot = context.bot
-	endpoint = address + 'users'
+	endpoint = catalog_address + 'users'
 	request_json = {}
 
 	if len(arguments) == 0:
@@ -69,7 +69,7 @@ def users(update, context):
 			bot.send_message(chat_id=chat_id, msg=msg)
 			return
 
-		msg = 'Device IDs:\n'
+		msg = 'Users IDs:\n'
 		for user_id in response_json.keys():
 			msg += user_id + '\n'
 		bot.send_message(chat_id=chat_id, msg=msg)
@@ -94,7 +94,7 @@ def services(update, context):
 	arguments = context.args
 	chat_id = update.chat_id()
 	bot = context.bot
-	endpoint = address + 'services'
+	endpoint = catalog_address + 'services'
 	request_json = {}
 
 	if len(arguments) == 0:
@@ -106,7 +106,7 @@ def services(update, context):
 			bot.send_message(chat_id=chat_id, msg=msg)
 			return
 
-		msg = 'Device IDs:\n'
+		msg = 'Services IDs:\n'
 		for service_id in response_json.keys():
 			msg += service_id + '\n'
 		bot.send_message(chat_id=chat_id, msg=msg)
