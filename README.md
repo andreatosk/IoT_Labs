@@ -52,7 +52,7 @@ To try the bot, first install the Python APIs on which the bot relies:
 ```bash
 pip install python-telegram-bot
 ```
-To try the bot, launch "main.py" and "bot.py" cointained in /TelegramBot/ and start a chat from the following link:
+Then, launch "main.py" and "bot.py" cointained in /TelegramBot/ and start a chat from the following link:
 ```bash
 https://t.me/polito_iotlabs_invokecatalog_bot
 ```
