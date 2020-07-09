@@ -72,8 +72,8 @@ class ServiceManager(object):
 			new_service = ServiceManager.format_new_service(recieved_json)
 			registered_services[recieved_json['service_id']] = new_service
 		else:
-			registered_services['service_id']['insertion_timestamp'] = str(time.time())
-		ServiceManager.memory_unlock()
+			registered_services[recieved_json['service_id']]['insertion_timestamp'] = str(time.time())
+		ServiceManager.unlock_memory()
 		ServiceManager.write_to_local()
 
 
@@ -105,35 +105,35 @@ class ServiceManager(object):
 		with open(registered_services_filename, 'w') as file:
 			json.dump(registered_services, file)
 			file.close()
-		ServiceManager.file_unlock()
+		ServiceManager.unlock_file()
 
 	def get_memory_status():
-		return self.memory_locked
+		return ServiceManager.memory_locked
 
 	def get_file_status():
-		return self.file_locked
+		return ServiceManager.file_locked
 
 	def lock_memory():
-		self.memory_locked = True
+		ServiceManager.memory_locked = True
 
 	def get_memory_access():
-		while self.get_memory_status() is True:
+		while ServiceManager.get_memory_status() is True:
 			pass
-		self.lock_memory()
+		ServiceManager.lock_memory()
 
 	def get_file_access():
-		while self.get_file_status() is True:
+		while ServiceManager.get_file_status() is True:
 			pass
-		self.lock_file()
+		ServiceManager.lock_file()
 
 	def lock_file():
-		self.file_locked = True
+		ServiceManager.file_locked = True
 
 	def unlock_file():
-		self.file_locked = False
+		ServiceManager.file_locked = False
 
 	def unlock_memory():
-		self.memory_locked = False
+		ServiceManager.memory_locked = False
 
 	def get_mem_json():
 		global registered_services
