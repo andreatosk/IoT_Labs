@@ -1,53 +1,63 @@
-from threading import Thread
+import threading
 import json
 import DeviceManager, ServiceManager
 import time
 
-wait_time = 60 # Seconds
-delete_margin = 120 # Seconds
+minutes = 60
+wait_time = 5*minutes
+delete_margin = 2*minutes
 
-class Cleaner():
+class Cleaner(threading.Thread):
 
-	def __init__(self):
-		cleaner_thread = Thread(target=self.start_cleaning, args=self)
+	def __init__(self, threadID, name, counter):
+		threading.Thread.__init__(self)
+		self.threadID = threadID
+		self.name = name
+		self.counter = counter
 
-	def start_cleaning(self):
+	def run(self):
 		while True:
+			print('Cleaning')
 			time.sleep(wait_time)
 
 			# Devices
+			DeviceManager.DeviceManager.get_memory_access()
+			old_json = DeviceManager.DeviceManager.get_mem_json()
+			new_json = {}
 
-			DeviceManager.get_mem_access()
-			json = DeviceManager.get_mem_json()
-			for device in json:
-				device_time = float(device['insertion_timestamp'])
+			for device in old_json:
+				device_time = float(old_json[device]['insertion_timestamp'])
 				actual_time = time.time()
-				if actual_time - device_time > delete_margin:
-					json.pop(device['device_id'])
-			set_mem_json(json)
-			DeviceManager.get_file_access()
-			filename = DeviceManager.get_filename()
-			DeviceManager.unlock_memory()
+				if actual_time - device_time <= delete_margin:
+					new_old_json[device] = old_json[device]
+
+
+			DeviceManager.DeviceManager.set_mem_json(new_json)
+			DeviceManager.DeviceManager.get_file_access()
+			filename = DeviceManager.DeviceManager.get_filename()
+			DeviceManager.DeviceManager.unlock_memory()
 			with open(filename, 'w') as file:
-				json.dumps(json, file)
+				json.dump(new_json, file)
 				file.close()
-			DeviceManager.unlock_file()
+			DeviceManager.DeviceManager.unlock_file()
+			
+
 			#Services
-
-			ServiceManager.get_mem_access()
-			json = ServiceManager.get_mem_json()
-			for service in json:
-				service_time = float(service['insertion_timestamp'])
+			ServiceManager.ServiceManager.get_memory_access()
+			old_json = ServiceManager.ServiceManager.get_mem_json()
+			new_json = {}
+			for service in old_json:
+				service_time = float(old_json[service]['insertion_timestamp'])
 				actual_time = time.time()
-				if actual_time - service_time > delete_margin:
-					json.pop(service['service_id'])
-			set_mem_json(json)
-			ServiceManager.get_file_access()
-			filename = ServiceManager.get_filename()
-			ServiceManager.unlock_memory()
+				if actual_time - service_time <= delete_margin:
+					new_old_json[device] = old_json[device]
+			ServiceManager.ServiceManager.set_mem_json(new_json)
+			ServiceManager.ServiceManager.get_file_access()
+			filename = ServiceManager.ServiceManager.get_filename()
+			ServiceManager.ServiceManager.unlock_memory()
 			with open(filename, 'w') as file:
-				json.dumps(json, file)
+				json.dump(new_json, file)
 				file.close()
-			ServiceManager.unlock_file()
+			ServiceManager.ServiceManager.unlock_file()
 
 

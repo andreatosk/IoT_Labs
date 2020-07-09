@@ -3,8 +3,9 @@ import json
 import DeviceManager, ServiceManager
 import time
 
-wait_time = 20 # Seconds
-delete_margin = 20 # Seconds
+minutes = 60
+wait_time = 5*minutes
+delete_margin = 2*minutes
 
 class Cleaner(threading.Thread):
 
