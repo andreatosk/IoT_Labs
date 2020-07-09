@@ -1,7 +1,10 @@
 from telegram.ext import Updater, CommandHandler
+from telegram import ParseMode
 import requests
 import json
 
+import logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import DeviceManager
 import ServiceManager
@@ -14,12 +17,12 @@ devices_filename = DeviceManager.DeviceManager.get_filename()
 users_filename = UserManager.UserManager.get_filename()
 services_filename = ServiceManager.ServiceManager.get_filename()
 
-def chat_id(update):
+def get_chat_id(update):
 	return update.effective_chat.id
 
 def devices(update, context):
 	arguments = context.args
-	chat_id = chat_id(update)
+	chat_id = get_chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'devices'
 	request_json = {}
@@ -30,13 +33,13 @@ def devices(update, context):
 		response_json = response.json()
 		if response.status_code != 200:
 			msg = 'Something went wrong processing your request.'
-			bot.send_message(chat_id=chat_id, msg=msg)
+			bot.send_message(chat_id=chat_id, text=msg)
 			return
 
 		msg = 'Devices IDs:\n'
 		for device_id in response_json.keys():
 			msg += device_id + '\n'
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 	else:
 		msg = 'Data:\n'
 		for device_id in arguments:
@@ -46,16 +49,16 @@ def devices(update, context):
 				response_json = response.json()
 				if response.status_code != 200:
 					msg = 'Something went wrong processing your request.'
-					bot.send_message(chat_id=chat_id, msg=msg)
+					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json)
+				msg += str(response_json) + '\n\n\n' 
 			except:
 				msg += device_id + " not found.\n"
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 
 def users(update, context):
 	arguments = context.args
-	chat_id = chat_id(update)
+	chat_id = get_chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'users'
 	request_json = {}
@@ -66,13 +69,13 @@ def users(update, context):
 		response_json = response.json()
 		if response.status_code != 200:
 			msg = 'Something went wrong processing your request.'
-			bot.send_message(chat_id=chat_id, msg=msg)
+			bot.send_message(chat_id=chat_id, text=msg)
 			return
 
 		msg = 'Users IDs:\n'
 		for user_id in response_json.keys():
 			msg += user_id + '\n'
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 	else:
 		msg = 'Data:\n'
 		for user_id in arguments:
@@ -82,17 +85,17 @@ def users(update, context):
 				response_json = response.json()
 				if response.status_code != 200:
 					msg = 'Something went wrong processing your request.'
-					bot.send_message(chat_id=chat_id, msg=msg)
+					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json)
+				msg += str(response_json) + '\n\n\n'
 			except:
 				msg += user_id + " not found.\n"
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 
 
 def services(update, context):
 	arguments = context.args
-	chat_id = chat_id(update)
+	chat_id = get_chat_id(update)
 	bot = context.bot
 	endpoint = catalog_address + 'services'
 	request_json = {}
@@ -103,13 +106,13 @@ def services(update, context):
 		response_json = response.json()
 		if response.status_code != 200:
 			msg = 'Something went wrong processing your request.'
-			bot.send_message(chat_id=chat_id, msg=msg)
+			bot.send_message(chat_id=chat_id, text=msg)
 			return
 
 		msg = 'Services IDs:\n'
 		for service_id in response_json.keys():
 			msg += service_id + '\n'
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 	else:
 		msg = 'Data:\n'
 		for service_id in arguments:
@@ -119,16 +122,16 @@ def services(update, context):
 				response_json = response.json()
 				if response.status_code != 200:
 					msg = 'Something went wrong processing your request.'
-					bot.send_message(chat_id=chat_id, msg=msg)
+					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json)
+				msg += str(response_json) + '\n\n\n'
 			except:
 				msg += service_id + " not found.\n"
-		bot.send_message(chat_id=chat_id, msg=msg)
+		bot.send_message(chat_id=chat_id, text=msg)
 
 
 def help(update, context):
-	chat_id = chat_id(update)
+	chat_id = get_chat_id(update)
 	bot = context.bot
 
 	msg = '/help' + '\n'
@@ -137,17 +140,17 @@ def help(update, context):
 
 	msg = '/services' + '\n'
 	msg += 'Gets all services\' ids if sent alone, or retrieves informations about all the white-space seprated service ids sent along\n\n'
-	msg += 'e.g. "/services", "/services hjk_418 tncrd_cld"'
+	msg += 'e.g. "/services", "/services http_418 tncrd_cld"'
 	bot.send_message(chat_id=chat_id, text=msg)
 
 	msg = '/devices' + '\n'
 	msg += 'Gets all devices\' ids if sent alone, or retrieves informations about all the white-space seprated device ids sent along\n\n'
-	msg += 'e.g. "/devices", "/devices hjk_418 tncrd_cld"'
+	msg += 'e.g. "/devices", "/devices http_418 tncrd_cld"'
 	bot.send_message(chat_id=chat_id, text=msg)
 
 	msg = '/users' + '\n'
 	msg += 'Gets all users\' ids if sent alone, or retrieves informations about all the white-space seprated user ids sent along\n\n'
-	msg += 'e.g. "/users", "/users hjk_418 tncrd_cld"'
+	msg += 'e.g. "/users", "/users http_418 tncrd_cld"'
 	bot.send_message(chat_id=chat_id, text=msg)
 
 
@@ -170,7 +173,7 @@ if __name__ == '__main__':
 
 	# Starting Execution
 
-	print('Everything went fine. Bot Online.')
 	updater.start_polling()
 	updater.idle()
+
 
