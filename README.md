@@ -44,6 +44,19 @@ Current Lab structure:
 
 ```
 
+# Collezione Postman
+È possibile importare questa collezione su Postman per avere a disposizione delle richieste modificabili per interagire/testare le API
+
+# Bot Telegram
+
+Per interagire con il bot, fare partire il file "main.py" e "bot.py" contenuti nella sua cartella e avviare una chat
+
+```bash
+https://t.me/polito_iotlabs_invokecatalog_bot
+```
+
+Ulteriori spiegazioni possono essere fornite tramite il comando "/help"
+
 # JSON Templates:
 Devices
 ```json
