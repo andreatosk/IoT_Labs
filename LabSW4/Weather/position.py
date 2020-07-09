@@ -16,7 +16,7 @@ def get_position(ipaddress=''):
     try:
         r=requests.get(url)
     except requests.exceptions.RequestException as e:
-        raise e
+        return False
 
     
     data=json.loads(r.content)
@@ -26,7 +26,7 @@ def get_position(ipaddress=''):
 
 
     #success
-    #del data['status']
+    del data['status']
 
     return data
 

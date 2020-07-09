@@ -1,15 +1,20 @@
 import requests
 import json
 from position import get_position
-import time
 
 weather_server='http://www.7timer.info/bin/civil.php'
 
-def get_weather():
+def convert_data(row_data, jdict):
+    clean_data={}
+    base_time=int(row_data["init"][8:])
+    for data in jdict['dataseries']:
+        clean_data[base_time+data['timepoint']]
+
+def get_weather(jdict, ipaddress):
     global weather_server
     
     #SOLO PER IL DEBUG
-    params=get_position()
+    params=get_position(ipaddress)
     while(type(params)==type(True) and not params):
         #qualcosa è andato storto, riprovo
         params=get_position()
@@ -47,18 +52,16 @@ def get_weather():
     #        },
     #}
 
-    response=json.loads(r)
+    response=json.loads(r.content)
     #mi servono solo i primi 7 campi della lista "dataseries"
     del response['dataseries'][8:]
-    current_hour=time.localtime().tm_hour
-
+    return convert_data(response, jdict)
 
 
 def main():
-    #NB tools.session.on
-    pass
+    today_forecast=get_weather()
+    print(today_forecast)
 
-#mi registro al catalogo dei servizi
 
 if __name__ == '__main__':
     main()
