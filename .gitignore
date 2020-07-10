@@ -1,2 +1,4 @@
-LabSW2/*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
 LabSW2/*/*.json
+LabSW4/Weather/*.lock
