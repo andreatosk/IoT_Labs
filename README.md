@@ -1,6 +1,7 @@
 # IoT_Labs
 Current Lab structure:
 ```bash
+.
 ├─Lab1
 ├───HW
 ├─────Part1
@@ -20,7 +21,6 @@ Current Lab structure:
 ├─────Part2
 ├───────smartHome
 ├─────Part3
-├───────3_1
 ├───SW
 ├─────Es1
 ├─────Es2
@@ -36,11 +36,15 @@ Current Lab structure:
 ├─────────thirdparty
 ├─LabSW2
 ├───1
-├─────__pycache__
 ├───2
 ├───3
+├───5
+├───6
 ├─LabSW3
-└───3
+├───3
+├─LabSW4
+├───TelegramBot
+└───Weather
 
 ```
 
