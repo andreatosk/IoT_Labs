@@ -7,10 +7,28 @@ weather_server='http://www.7timer.info/bin/civil.php'
 def convert_data(row_data, jdict):
     clean_data={}
     base_time=int(row_data["init"][8:])
-    for data in jdict['dataseries']:
-        clean_data[base_time+data['timepoint']]
+    for data in row_data['dataseries']:
+        key=str((base_time+int(data['timepoint']))%24)
+        clean_data[key]={}
+        #temperature
+        clean_data[key]['temperature']=str(data['temp2m'])+'°C'
+        #wind
+        clean_data[key]['wind']=jdict['wind10m']['values'][str(data['wind10m']['speed'])]+jdict['wind10m']['unit']+', '+data['wind10m']['direction']
+        #weather
+        if data['prec_type'] not in jdict['prec_type'].keys():
+            clean_data[key]['weather']='sun/moon & stars'
+        else:
+            clean_data[key]['weather']=jdict['prec_type'][data['prec_type']]+': '+jdict['prec_amount']['values'][str(data['prec_amount'])]+jdict['prec_amount']['unit']
+        #clouds
+        clean_data[key]['clouds']=jdict['cloudcover'][str(data['cloudcover'])]
+        #humidity
+        clean_data[key]['humidity']=data['rh2m']
 
-def get_weather(jdict, ipaddress):
+    return clean_data
+
+
+
+def get_weather(jdict, ipaddress=''):
     global weather_server
     
     #SOLO PER IL DEBUG
@@ -53,13 +71,15 @@ def get_weather(jdict, ipaddress):
     #}
 
     response=json.loads(r.content)
-    #mi servono solo i primi 7 campi della lista "dataseries"
+    #mi servono solo i primi 7 campi della lista "dataseries": salvo solo il meteo delle prossime 24h
     del response['dataseries'][8:]
     return convert_data(response, jdict)
 
 
 def main():
-    today_forecast=get_weather()
+    today_forecast=None
+    with open('weatherconversion.json') as jf:
+        today_forecast=get_weather(json.load(jf))
     print(today_forecast)
 
 
