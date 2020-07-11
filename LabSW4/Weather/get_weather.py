@@ -11,7 +11,7 @@ def convert_data(row_data, jdict):
         key=str((base_time+int(data['timepoint']))%24)
         clean_data[key]={}
         #temperature
-        clean_data[key]['temperature']=str(data['temp2m'])+'°C'
+        clean_data[key]['temperature']=str(data['temp2m'])+'Cel'
         #wind
         clean_data[key]['wind']=jdict['wind10m']['values'][str(data['wind10m']['speed'])]+jdict['wind10m']['unit']+', '+data['wind10m']['direction']
         #weather
