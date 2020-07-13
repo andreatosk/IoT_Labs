@@ -39,16 +39,17 @@ class MQTTPublisher():
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
-        r=requests.put(catalogURL, json.dumps(myself))
-        if not r:
-            #4xx o 5xx
+        try:
+            r=requests.put(catalogURL, json.dumps(myself))
+        except requests.exceptions.RequestException as e:
             return False
         return True
 
     def _get_message_broker(self):
-        r=requests.get(catalogURL)
+        try:
+            r=requests.get(catalogURL)
         if not r:
-            #vuol dire che è stato ritornato un errore 4xx o 5xx
+        except requests.exceptions.RequestException as e:
             return False
         data=json.loads(r.content)
         self.broker=data['ip_address']
@@ -57,9 +58,9 @@ class MQTTPublisher():
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
-        r=requests.post(self.catalogURL)
-        if not r:
-            #4xx o 5xx
+        try:
+            r=requests.post(self.catalogURL)
+        except requests.exceptions.RequestException as e:
             return False
         services=r.content
         for s_ID, service in services.items():
@@ -74,7 +75,7 @@ class MQTTPublisher():
     def switch_LED(self, state):
         if type(state) != type(True):
             #errore: il messaggio può essere solo booleano
-            pass
+            return False
         if state == self.__LED_ON:
             #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
             return

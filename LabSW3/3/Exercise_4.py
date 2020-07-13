@@ -37,14 +37,16 @@ class MQTTPublisher():
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
-        r=requests.put(catalogURL, json.dumps(myself))
-        if not r:
+        try:
+            r=requests.put(catalogURL, json.dumps(myself))
+        except requests.exceptions.RequestException as e:
             return False
         return True
 
     def _get_message_broker(self):
-        r=requests.get(catalogURL)
-        if not r:
+        try:
+            r=requests.get(catalogURL)
+        except requests.exceptions.RequestException as e:
             return False
         data=json.loads(r.content)
         self.broker=data['ip_address']
@@ -53,8 +55,9 @@ class MQTTPublisher():
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
-        r=requests.post(self.catalogURL)
-        if not r:
+        try:
+            r=requests.post(self.catalogURL)
+        except requests.exceptions.RequestException as e:
             return False
         services=r.content
         for s_ID, service in services.items():
@@ -63,7 +66,7 @@ class MQTTPublisher():
         return True
 
     def _publish(self, topic, payload):
-        pass
+        self._mqtt.publish(topic, payload, qos=2)
 
     def _subscribe(self, topic):
         if not self.__isSub:

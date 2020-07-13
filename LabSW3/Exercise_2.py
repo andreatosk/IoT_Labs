@@ -17,13 +17,19 @@ class MQTTSubscriber():
 
 
         #registro al catalogo
-        self._register()        
+        success=self._register()
+        if not success:
+            return("Failed to register to catalog.")
 
-        #ricavo le info sul broker
-        self._get_message_broker()
+        # ottengo info dal catalogo:
+        success=self._get_message_broker()
+        if not success:
+            return("Failed to retrieve Message Broker info.")
 
         #ottengo gli endpoints dal catalogo
-        self._get_topics()
+        success=self._get_topics()
+        if not success:
+            return("Failed to retrieve endpoints.")
         
 
         self.start()
@@ -36,16 +42,18 @@ class MQTTSubscriber():
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
-        r=requests.put(catalogURL, json.dumps(myself))
-        if not r:
-            #4xx o 5xx
-            pass
+        try:
+            r=requests.put(catalogURL, json.dumps(myself))
+        except requests.exceptions.RequestException as e:
+            return False
+
+        return True
 
     def _get_message_broker(self):
-        r=requests.get(self.catalogURL)
-        if not r:
-            #vuol dire che è stato ritornato un errore 4xx o 5xx
-            pass
+        try:
+            r=requests.get(self.catalogURL)
+        except requests.exceptions.RequestException as e:
+            return False
         data=json.loads(r.content)
         self.broker=data['ip_address']
         self.port=data['port']
@@ -54,16 +62,19 @@ class MQTTSubscriber():
         # - [0]:/devices
         # - [1]:/users
         # - [2]:/services
+        return True
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
-        r=requests.post(self.catalogURL)
-        if not r:
-            #4xx o 5xx
+        try:
+            r=requests.post(self.catalogURL)
+        except requests.exceptions.RequestException as e:
+            return False
         services=r.content
         for s_ID, service in services.items():
             if service['description']=='temperature'
                 self.topics.extend(service['endpoints'])
+        return True
 
 
     def start(self):
