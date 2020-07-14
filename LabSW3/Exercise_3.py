@@ -99,4 +99,4 @@ class MQTTPublisher():
             ]
         }
         self.__LED_ON=state
-        self._mqtt.publish(topic, data,2)
+        self._mqtt.publish(topic, json.dumps(message),2)

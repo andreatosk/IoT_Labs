@@ -27,9 +27,10 @@ class WeatherService:
         exp=''
         if len(uri) > 1 or len(params) != 0:
             #error
-            pass
+            raise cherrypy.HTTPError(400, "Wrong request format.")
 
-        if len(uri) == 1 and uri[0] == 'new':
+        if (len(uri) == 1 and uri[0] == 'new') or ('addr' in cherrypy.session.keys() and cherrypy.session['addr'] != cherrypy.request.remote.ip):
+            #se cambia indirizzo ip o se viene richiesto esplicitamente di terminare la sessione
             cherrypy.lib.sessions.expire()
             #exp='Session expired.<br>'
 
