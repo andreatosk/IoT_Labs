@@ -20,6 +20,19 @@ services_filename = ServiceManager.ServiceManager.get_filename()
 def get_chat_id(update):
 	return update.effective_chat.id
 
+def format_device(device_json):
+	string = ''
+	string += 'Device ID: ' + device_json['device_id']
+	string += 'Resources: '
+	for resource in device_json['resources']:
+		string += '\n\t\t' + resource
+	string += 'Endpoints: '
+	for endpoint in device_json['endpoints']:
+		string += '\n\t\t' + endpoint
+	string += '\nTimestamp: ' + device_json['insertion_timestamp']
+	string += '\n\n'
+	return string
+
 def devices(update, context):
 	arguments = context.args
 	chat_id = get_chat_id(update)
@@ -37,7 +50,7 @@ def devices(update, context):
 			return
 
 		msg = 'Devices IDs:\n'
-		for device_id in response_json.keys():
+		for device_id in response_json:
 			msg += device_id + '\n'
 		bot.send_message(chat_id=chat_id, text=msg)
 	else:
@@ -51,10 +64,21 @@ def devices(update, context):
 					msg = 'Something went wrong processing your request.'
 					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json) + '\n\n\n' 
+				msg += format_device(response_json)
 			except:
 				msg += device_id + " not found.\n"
 		bot.send_message(chat_id=chat_id, text=msg)
+
+def format_user(user_json):
+	string = ''
+	string += 'User ID: ' + user_json['user_id']
+	string += '\nName: ' + user_json['name']
+	string += '\nSurname: ' + user_json['surname']
+	string += '\nEmails:'
+	for email in user_json['email']:
+		string += '\n\t\t' + email
+	string += '\n\n'
+	return string
 
 def users(update, context):
 	arguments = context.args
@@ -83,14 +107,29 @@ def users(update, context):
 			response = requests.post(endpoint, json=request_json)
 			try:
 				response_json = response.json()
+				print(response_json)
 				if response.status_code != 200:
 					msg = 'Something went wrong processing your request.'
 					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json) + '\n\n\n'
+				msg += format_user(response_json)
 			except:
 				msg += user_id + " not found.\n"
 		bot.send_message(chat_id=chat_id, text=msg)
+
+
+def format_service(service_json):
+	string = ''
+	string += 'Service ID: ' + service_json['service_id']
+	string += '\nDescription: ' + service_json['description']
+	string += '\nEndpoints: '
+	for endpoint in service_json['endpoints']:
+		string += '\n\t\t' + endpoint
+	print(service_json['endpoints'])
+	string += '\nTimestamp: ' + service_json['insertion_timestamp']
+	print(service_json['insertion_timestamp'])
+	string += '\n\n'
+	return string
 
 
 def services(update, context):
@@ -110,7 +149,7 @@ def services(update, context):
 			return
 
 		msg = 'Services IDs:\n'
-		for service_id in response_json.keys():
+		for service_id in response_json:
 			msg += service_id + '\n'
 		bot.send_message(chat_id=chat_id, text=msg)
 	else:
@@ -124,7 +163,7 @@ def services(update, context):
 					msg = 'Something went wrong processing your request.'
 					bot.send_message(chat_id=chat_id, text=msg)
 					return
-				msg += str(response_json) + '\n\n\n'
+				msg += format_service(response_json)
 			except:
 				msg += service_id + " not found.\n"
 		bot.send_message(chat_id=chat_id, text=msg)

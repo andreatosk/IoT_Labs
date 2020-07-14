@@ -4,9 +4,7 @@ import json
 import DeviceManager
 import UserManager
 import ServiceManager
-import MqttDeviceManager
-
-import paho.mqtt.client as mqtt
+import Cleaner
 
 IP_ADDRESS = "0.0.0.0"
 PORT = 8080
@@ -38,16 +36,12 @@ if __name__ == "__main__":
 	cherrypy.tree.mount(DeviceManager.DeviceManager(), '/devices', conf)
 	cherrypy.tree.mount(ServiceManager.ServiceManager(), '/services', conf)
 	cherrypy.tree.mount(UserManager.UserManager(), '/users', conf)
-	#cherrypy.tree.mount(MqttDeviceManager.MqttDeviceManager('catalog'), '/mqtt/devices', conf)
-
 
 	cherrypy.config.update({
 		'server.socket_host' : IP_ADDRESS,
 		'server.socket_port' : PORT
 		})
 
+	Cleaner.Cleaner(0, 'cleaner_thread', 0).start()
 	cherrypy.engine.start()
-	mqtt_device_manager = MqttDeviceManager.MqttDeviceManager('catalog')
-	mqtt_device_manager.start()
 	cherrypy.engine.block()
-	mqtt_device_manager.stop()
