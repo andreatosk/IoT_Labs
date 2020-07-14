@@ -1,5 +1,6 @@
 import paho.mqtt.client as moquette
 import json
+import time
 
 class MQTTPublisher():
     def __init__(self, ID, catalogURL):
@@ -10,6 +11,7 @@ class MQTTPublisher():
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
+        self.topics=[]
 
         # assumo che il led di default sia spento
         self.__LED_ON=False
@@ -47,7 +49,7 @@ class MQTTPublisher():
 
     def _get_message_broker(self):
         try:
-            r=requests.get(catalogURL)
+            r=requests.put(catalogURL)
         if not r:
         except requests.exceptions.RequestException as e:
             return False
@@ -64,7 +66,10 @@ class MQTTPublisher():
             return False
         services=r.content
         for s_ID, service in services.items():
-            if service['description']=='led'
+            if service['description']=='led':
+                for ep in service['endpoints']:
+                    self.endpoints.append(json.loads(ep))
+
                 self.topics.extend(service['endpoints'])
         return True
 
@@ -79,7 +84,19 @@ class MQTTPublisher():
         if state == self.__LED_ON:
             #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
             return
-        #Quale topic scelgo tra quelli validi dello Yùn?
-        topic=''
+
+        #per il momento assumo che ci sia un solo topic valido
+        topic=self.endpoints[0]
         #PER IL DATAFORMAT DEVO CONOSCERE CHE COSA SI ASPETTA IL CLIENT MQTT SULLA YÙN
+        message={"bn":self.ID,
+                "e":[
+                {
+                    "n":"led",
+                    "t":time.time()
+                    "v":int(state),
+                    "u":None
+                }
+            ]
+        }
+        self.__LED_ON=state
         self._mqtt.publish(topic, data,2)

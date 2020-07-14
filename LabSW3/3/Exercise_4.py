@@ -61,8 +61,12 @@ class MQTTPublisher():
             return False
         services=r.content
         for s_ID, service in services.items():
-            #NON DOVREBBERO ESSERE TUTTI I TOPIC (?)
-            self.topics[service['description']]=service['endpoints']
+            #NON DOVREBBERO ESSERE TUTTI GLI ENDPOINTS (?)
+            key=service['description']
+            self.topics[key]=[]
+            for ep in service['endpoints']:
+                self.topics.append(json.loads(ep))
+            
         return True
 
     def _publish(self, topic, payload):
@@ -82,8 +86,22 @@ class MQTTPublisher():
 
 
     #punto 1
-    def actuate_fan(self):
-        pass
+    def actuate_fan(self, value):
+        topic=self.topics['fan'][]
+        value=int(value)
+        if value <0 or value >255:
+            return False
+        message={"bn":self.ID,
+                "e":[
+                {
+                    "n":"fan",
+                    "t":time.time()
+                    "v":value,
+                    "u":None
+                }
+            ]
+        }
+        self._publish(topic, json.dumps(message))
 
     #punto 2
     def actuate_led(self):

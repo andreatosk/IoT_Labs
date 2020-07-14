@@ -130,12 +130,14 @@ Weather
 ```
 
 Endpoints
+-Template:
 ```json
 {
   "description":"This is a description",
   "value":"some endpoint"
 }
 ```
+-Available descriptions are the last fields of topics (following)
 
 #MQTT topics:
 ```
