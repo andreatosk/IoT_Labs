@@ -15,7 +15,6 @@ unsigned long first;
 unsigned long second;
 
 DynamicJsonDocument doc_snd(capacity);
-BridgeServer server;
 
 int my_curl(String data, String address)
 {
