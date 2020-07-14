@@ -129,6 +129,14 @@ Weather
 }
 ```
 
+Endpoints
+```json
+{
+  "description":"This is a description",
+  "value":"some endpoint"
+}
+```
+
 #MQTT topics:
 ```
 - /tiot/18/temperature
