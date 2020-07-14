@@ -118,3 +118,23 @@ Users
     "other_users_ids"
 }
 ```
+
+Weather
+```json
+{
+  "temperature":"value + 'Cel'",
+  "wind":"value + 'm/s' + direction",
+  "weather":"current_weather",
+  "humidity":"value + '%'"
+}
+```
+
+#MQTT topics:
+```
+- /tiot/18/temperature
+- /tiot/18/led (normal led)
+- /tiot/18/heating (thermistor)
+- /tiot/18/fan
+- /tiot/18/setpoints
+- /tiot/18/people (PIR + noise)
+```
