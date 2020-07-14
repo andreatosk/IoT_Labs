@@ -44,7 +44,7 @@ class ServiceManager(object):
 
 		return False, ''
 
-
+# Restituisce un dizionario formattato del JSON ricevuto dalla PUT
 	def format_new_service(recieved_json):
 		new_service = {}
 		new_service['service_id'] = recieved_json['service_id']
@@ -95,7 +95,7 @@ class ServiceManager(object):
 		else:
 			return json.dumps(registered_services[request])
 
-
+# Queste funzioni regolano la contesa dell'accesso ai dati in memoria principale/secondaria
 	def write_to_local():
 		global registered_services
 		ServiceManager.get_file_access()

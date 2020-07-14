@@ -5,8 +5,8 @@ import time
 n = 2
 loops = 3
 address = 'http://127.0.0.1:8080/devices'
-if __name__ == '__main__':
 
+if __name__ == '__main__':
 	for i in range(loops):
 		device_id = input('device_id to register: ')
 		resources = []
@@ -24,7 +24,7 @@ if __name__ == '__main__':
 		json_data_check['device_id'] = device_id
 		for k in range(loops):
 			requests.put(address, json = json_data)
-			response = requests.post(address, json = json_data_check)
+			response = requests.post(address, json = json_data_check) # Per controllare l'inserimento
 			print(response.json())
 			time.sleep(5)
 			print("\n")

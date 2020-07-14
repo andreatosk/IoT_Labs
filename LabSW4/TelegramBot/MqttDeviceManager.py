@@ -14,7 +14,6 @@ class MqttDeviceManager(object):
 		self.client = mqtt.Client(client_id, False)
 		self.client.on_connect = self.on_connect
 		self.client.on_message = self.on_message
-		self.client.on_log = self.on_log 	#For Debug Purposes Only
 		self.client.on_subscribe = self.on_subscribe
 
 	def on_connect(self, paho_mqtt, userdata, flags, rc):
@@ -31,14 +30,9 @@ class MqttDeviceManager(object):
 	def on_subscribe(self, client, userdata, mid, granted_qos):
 		pass
 
-	# For Debug Purposes Only
-	def on_log(self, paho_mqtt, userdata, level, buf):
-		print('[LOG] : ' + buf)
-
 	def start(self):
 		self.client.connect(self.broker, self.port)
 		self.client.loop_start()
-
 
 	def stop(self):
 		self.client.loop_stop()

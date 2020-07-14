@@ -10,16 +10,17 @@ import DeviceManager
 import ServiceManager
 import UserManager
 
-bot_token = '1234270596:AAECZOBEe3E3b-r0QQz2j3LprxHJga6qikA'
+bot_token = '1234270596:AAECZOBEe3E3b-r0QQz2j3LprxHJga6qikA' # Per le API Telegram
 catalog_address = 'http://127.0.0.1:8080/'
 
 devices_filename = DeviceManager.DeviceManager.get_filename()
 users_filename = UserManager.UserManager.get_filename()
 services_filename = ServiceManager.ServiceManager.get_filename()
 
-def get_chat_id(update):
-	return update.effective_chat.id
+def get_chat_id(update): 
+	return update.effective_chat.id # Restituisce la chat ID per l'invio dei messaggi
 
+# Formatta le informazioni del dispositivo
 def format_device(device_json):
 	string = ''
 	string += 'Device ID: ' + device_json['device_id']
@@ -40,7 +41,7 @@ def devices(update, context):
 	endpoint = catalog_address + 'devices'
 	request_json = {}
 
-	if len(arguments) == 0:
+	if len(arguments) == 0: # Non è fornito un ID al comando
 		request_json['device_id'] = ''
 		response = requests.post(endpoint, json=request_json)
 		response_json = response.json()
@@ -51,9 +52,9 @@ def devices(update, context):
 
 		msg = 'Devices IDs:\n'
 		for device_id in response_json:
-			msg += device_id + '\n'
+			msg += device_id + '\n'	# "Incolla" tutti gli ID
 		bot.send_message(chat_id=chat_id, text=msg)
-	else:
+	else: # È fornito almeno un ID
 		msg = 'Data:\n'
 		for device_id in arguments:
 			request_json['device_id'] = device_id
@@ -65,10 +66,11 @@ def devices(update, context):
 					bot.send_message(chat_id=chat_id, text=msg)
 					return
 				msg += format_device(response_json)
-			except:
+			except:	# L'eccezione è scatenata se e solo se l'ID non è presente in memoria
 				msg += device_id + " not found.\n"
 		bot.send_message(chat_id=chat_id, text=msg)
 
+# Formatta le informazioni utente
 def format_user(user_json):
 	string = ''
 	string += 'User ID: ' + user_json['user_id']
@@ -79,7 +81,7 @@ def format_user(user_json):
 		string += '\n\t\t' + email
 	string += '\n\n'
 	return string
-
+# Vedere commenti di devices(), struttura simile
 def users(update, context):
 	arguments = context.args
 	chat_id = get_chat_id(update)
@@ -117,7 +119,7 @@ def users(update, context):
 				msg += user_id + " not found.\n"
 		bot.send_message(chat_id=chat_id, text=msg)
 
-
+# Formatta le informazioni del servizio
 def format_service(service_json):
 	string = ''
 	string += 'Service ID: ' + service_json['service_id']
@@ -131,7 +133,7 @@ def format_service(service_json):
 	string += '\n\n'
 	return string
 
-
+# Vedere commenti di devices(), struttura simile
 def services(update, context):
 	arguments = context.args
 	chat_id = get_chat_id(update)

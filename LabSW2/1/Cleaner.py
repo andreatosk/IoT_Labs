@@ -16,7 +16,6 @@ class Cleaner():
 			time.sleep(wait_time)
 
 			# Devices
-
 			DeviceManager.get_mem_access()
 			json = DeviceManager.get_mem_json()
 			for device in json:
@@ -32,8 +31,8 @@ class Cleaner():
 				json.dumps(json, file)
 				file.close()
 			DeviceManager.unlock_file()
-			#Services
 
+			#Services
 			ServiceManager.get_mem_access()
 			json = ServiceManager.get_mem_json()
 			for service in json:

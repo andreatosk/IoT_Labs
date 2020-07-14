@@ -51,7 +51,7 @@ class DeviceManager(object):
 
 		return False, ''
 
-
+# Restituisce un dizionario formattato del JSON ricevuto dalla PUT
 	def format_new_device(recieved_json):	
 		new_device = {}
 		new_device['device_id'] = recieved_json['device_id']
@@ -102,6 +102,7 @@ class DeviceManager(object):
 			except:
 				return json.dumps({})
 
+# Salva il JSON in locale
 	def write_to_local():
 		global registered_devices
 		DeviceManager.get_file_access()
@@ -110,6 +111,7 @@ class DeviceManager(object):
 			file.close()
 		DeviceManager.unlock_file()
 
+# Queste funzioni regolano la contesa dell'accesso ai dati in memoria principale/secondaria
 	def get_memory_status():
 		return DeviceManager.memory_locked
 

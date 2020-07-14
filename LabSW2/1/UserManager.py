@@ -55,7 +55,7 @@ class UserManager(object):
 			cherrypy.response.status = 400
 			return response
 
-		registered_users[recieved_json['user_id']] = recieved_json  
+		registered_users[recieved_json['user_id']] = recieved_json  # Per gli USER non è necessaria formattazione
 
 		UserManager.write_to_local()
 
@@ -78,6 +78,7 @@ class UserManager(object):
 		else:
 			return json.dumps(registered_users[request])
 
+# Salva il JSON in locale
 	def write_to_local():
 		global registered_users
 		with open(registered_users_filename, 'w') as file:
