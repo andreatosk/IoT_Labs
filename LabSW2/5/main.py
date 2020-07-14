@@ -38,8 +38,6 @@ if __name__ == "__main__":
 	cherrypy.tree.mount(DeviceManager.DeviceManager(), '/devices', conf)
 	cherrypy.tree.mount(ServiceManager.ServiceManager(), '/services', conf)
 	cherrypy.tree.mount(UserManager.UserManager(), '/users', conf)
-	#cherrypy.tree.mount(MqttDeviceManager.MqttDeviceManager('catalog'), '/mqtt/devices', conf)
-
 
 	cherrypy.config.update({
 		'server.socket_host' : IP_ADDRESS,

@@ -136,12 +136,12 @@ class DeviceManager(object):
 
 	def get_memory_access():
 		while DeviceManager.get_memory_status() is True:
-			print('Waiting for file...')
+			pass
 		DeviceManager.lock_memory()
 
 	def get_file_access():
 		while DeviceManager.get_file_status() is True:
-			print('Waiting for memory...')
+			pass
 		DeviceManager.lock_file()
 
 	def lock_file():
