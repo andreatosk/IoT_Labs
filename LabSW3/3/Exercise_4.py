@@ -82,11 +82,12 @@ class MQTTPublisher():
         self._mqtt.loop_start()
 
     def on_message(self, client, userdata, msg):
-        pass
-
+        if msg.topic.split('/')[-1]=='people':
+            self.sense_people(msg.payload)
 
     #punto 1
     def actuate_fan(self, value):
+        #TODO: sistemare le chiavi 
         topic=self.topics['fan'][]
         value=int(value)
         if value <0 or value >255:
@@ -102,15 +103,34 @@ class MQTTPublisher():
             ]
         }
         self._publish(topic, json.dumps(message))
+        return True
 
     #punto 2
-    def actuate_led(self):
-        pass
+    def actuate_led(self, value):
+        topic=self.topics['led'][]
+        value=int(value)
+        if value <0 or value >255:
+            return False
+        message={"bn":self.ID,
+                "e":[
+                {
+                    "n":"led",
+                    "t":time.time()
+                    "v":value,
+                    "u":None
+                }
+            ]
+        }
+        self._publish(topic, json.dumps(message))
+        return True
 
     #punto 5
-    def sense_people(self):
+    def sense_people(self, payload):
         #riceve info da PIR e noise
-        pass
+        message=json.loads(payload)
+        num_people=message['e']['v']
+        #CHE FACCIO CON IL NUMERO DI PERSONE?
+        
 
     #punti 3 e 4 implementati nel 5
     #punto 6 non necessario
@@ -118,5 +138,54 @@ class MQTTPublisher():
     #punto 8
     def change_set_points(self, min_fan=None, max_fan=None, min_led=None, max_led=None):
         #cambia solo i setpoint effettivamente ricevuti
-        #NB: PASSARE I PARAMETRI NELLA FORMA KEY=VALUE
-        pass
+        #NB: PASSARE I PARAMETRI NELLA FORMA KEY=VALUE PER EVITARE DI RISPETTARE L'ORDINE DEI PARAMETRI
+        topic=self.topics['setpoints'][]
+        if min_fan not None:
+            message={"bn":self.ID,
+                    "e":[
+                    {
+                        "n":"led",
+                        "t":time.time()
+                        "v":min_fan,
+                        "u":None
+                    }   
+                ]
+            }
+            self._publish(topic, json.dumps(message))
+        if max_fan not None:
+            message={"bn":self.ID,
+                    "e":[
+                    {
+                        "n":"led",
+                        "t":time.time()
+                        "v":max_fan,
+                        "u":None
+                    }   
+                ]
+            }
+            self._publish(topic, json.dumps(message))
+        if min_led not None:
+            message={"bn":self.ID,
+                    "e":[
+                    {
+                        "n":"led",
+                        "t":time.time()
+                        "v":min_led,
+                        "u":None
+                    }   
+                ]
+            }
+            self._publish(topic, json.dumps(message))
+        if max_led not None:
+            message={"bn":self.ID,
+                    "e":[
+                    {
+                        "n":"led",
+                        "t":time.time()
+                        "v":max_led,
+                        "u":None
+                    }   
+                ]
+            }
+            self._publish(topic, json.dumps(message))
+
