@@ -26,9 +26,9 @@ class DevicePublisher(object):
 		self.client.loop_stop()
 		self.client.disconnect()
 
-	def publish(self, topic):
+	def publish(self, topic, num=0):
 		msg = {}
-		device_id = 'random_device_id'
+		device_id = 'random_device_id_' + str(num)
 		msg = {}
 		msg['device_id'] = device_id
 		msg['endpoints'] = []
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 	for i in range(loops):
 		print('Publish #'+str(i+1))
-		publisher.publish(publisher.topic)
+		publisher.publish(publisher.topic, i)
 		time.sleep(wait_time)
 
 	publisher.stop()
