@@ -76,17 +76,10 @@ class UserManager(object):
 		if request == '':
 			return json.dumps(registered_users)
 		else:
-			try:
-				return json.dumps(registered_users[request])
-			except:
-				return '"user_id" not found.'
+			return json.dumps(registered_users[request])
 
 	def write_to_local():
 		global registered_users
 		with open(registered_users_filename, 'w') as file:
 			json.dump(registered_users, file)
 			file.close()
-
-	def get_filename():
-		global registered_users_filename
-		return registered_users_filename

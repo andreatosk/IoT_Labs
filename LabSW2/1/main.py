@@ -42,6 +42,6 @@ if __name__ == "__main__":
 		'server.socket_port' : PORT
 		})
 
-	Cleaner.Cleaner(0, 'cleaner_thread', 0).start()
+	Cleaner.Cleaner()
 	cherrypy.engine.start()
 	cherrypy.engine.block()

@@ -93,19 +93,14 @@ class DeviceManager(object):
 		# Se 'device_id' contiene un id, ritorna quello
 		global registered_devices
 		recievied_json = cherrypy.request.json
-		try:
-			request = recievied_json['device_id']
-		except:
-			return 'Missing "device_id" field'
-
-
+		request = recievied_json['device_id']
 		if request == '':
 			return json.dumps(registered_devices)
 		else:
 			try:
 				return json.dumps(registered_devices[request])
 			except:
-				return '"device_id" not found'
+				return json.dumps({})
 
 	def write_to_local():
 		global registered_devices
@@ -114,17 +109,6 @@ class DeviceManager(object):
 			json.dump(registered_devices, file)
 			file.close()
 		DeviceManager.unlock_file()
-
-	def add_from_mqtt(recieved_json):
-		global registered_devices
-		global registered_devices_filename
-		DeviceManager.get_memory_access()
-		DeviceManager.get_file_access()
-		registered_devices[recieved_json['device_id']] = recieved_json
-		DeviceManager.write_to_local()
-		DeviceManager.unlock_file()
-		DeviceManager.unlock_memory()
-
 
 	def get_memory_status():
 		return DeviceManager.memory_locked
