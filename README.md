@@ -129,6 +129,23 @@ Weather
 }
 ```
 
+Actuation and sensing messages:
+-Template:
+```json
+{"bn":"ID of master in this communication",
+  "e":[
+    {
+    "n":"led",
+    "t":"timestamp",
+    "v":"value",
+    "u":"unit"
+    }
+  ]
+}
+```
+-Available values for field "n" are the last fields of the topics (following)
+
+
 Endpoints
 -Template:
 ```json
@@ -137,7 +154,7 @@ Endpoints
   "value":"some endpoint"
 }
 ```
--Available descriptions are the last fields of topics (following)
+-Available descriptions are the last fields of the topics (following)
 
 #MQTT topics:
 ```
