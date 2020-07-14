@@ -29,7 +29,7 @@ class Cleaner(threading.Thread):
 				device_time = float(old_json[device]['insertion_timestamp'])
 				actual_time = time.time()
 				if actual_time - device_time <= delete_margin:
-					new_old_json[device] = old_json[device]
+					new_json[device] = old_json[device]
 
 
 			DeviceManager.DeviceManager.set_mem_json(new_json)
