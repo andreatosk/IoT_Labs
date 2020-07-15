@@ -1,13 +1,13 @@
 import paho.mqtt.client as moquette
 import json
 import time
+import requests
 
 class MQTTPublisher():
     def __init__(self, ID, catalogURL):
         self.ID=ID
         self.description="publisher"
         self._mqtt=moquette.Client(self.ID, False)
-        self._mqtt.on_message=self.on_message
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
@@ -20,16 +20,19 @@ class MQTTPublisher():
         success=self._register()
 
         if not success:
-            return("Failed to register to catalog.")
+            print("Failed to register to catalog.")
+            return
         # ottengo info dal catalogo:
         success=self._get_message_broker()
 
         if not success:
-            return("Failed to retrieve Message Broker info.")
+            print("Failed to retrieve Message Broker info.")
+            return
         #ottengo gli endpoints dal catalogo
         success=self._get_topics()
         if not success:
-            return("Failed to retrieve endpoints.")
+            print("Failed to retrieve endpoints.")
+            return
 
         self.start()
 
@@ -37,20 +40,20 @@ class MQTTPublisher():
         myself={}
         jdict={}
         jdict['service_id']=self.ID
-        jdict['description']=self._description
+        jdict['description']=self.description
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
         try:
-            r=requests.put(catalogURL, json.dumps(myself))
+            r=requests.put(self.catalogURL, json.dumps(myself))
         except requests.exceptions.RequestException as e:
+            #print(e)
             return False
         return True
 
     def _get_message_broker(self):
         try:
-            r=requests.put(catalogURL)
-        if not r:
+            r=requests.put(self.catalogURL)
         except requests.exceptions.RequestException as e:
             return False
         data=json.loads(r.content)
@@ -92,7 +95,7 @@ class MQTTPublisher():
                 "e":[
                 {
                     "n":"led",
-                    "t":time.time()
+                    "t":time.time(),
                     "v":int(state),
                     "u":None
                 }
@@ -100,3 +103,9 @@ class MQTTPublisher():
         }
         self.__LED_ON=state
         self._mqtt.publish(topic, json.dumps(message),2)
+
+def main():
+    client=MQTTPublisher('myid', 'http://localhost')
+
+if __name__ == '__main__':
+    main()

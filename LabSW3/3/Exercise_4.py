@@ -1,5 +1,6 @@
 import paho.mqtt.client as moquette
 import json
+import requests
 
 class MQTTPublisher():
     def __init__(self, ID, catalogURL):
@@ -11,21 +12,25 @@ class MQTTPublisher():
         self.broker=None
         self.port=None
         self.topics={}
+        self.__useful_topics=['fan','led','people','heating','setpoints']
 
         #registro al catalogo
         success=self._register()
 
         if not success:
-            return("Failed to register to catalog.")
+            print("Failed to register to catalog.")
+            return
         # ottengo info dal catalogo:
         success=self._get_message_broker()
 
         if not success:
-            return("Failed to retrieve Message Broker info.")
+            print("Failed to retrieve Message Broker info.")
+            return
         #ottengo gli endpoints dal catalogo
         success=self._get_topics()
         if not success:
-            return("Failed to retrieve endpoints.")
+            print("Failed to retrieve endpoints.")
+            return
 
         self.start()
 
@@ -33,19 +38,19 @@ class MQTTPublisher():
         myself={}
         jdict={}
         jdict['service_id']=self.ID
-        jdict['description']=self._description
+        jdict['description']=self.description
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
         try:
-            r=requests.put(catalogURL, json.dumps(myself))
+            r=requests.put(self.catalogURL, json.dumps(myself))
         except requests.exceptions.RequestException as e:
             return False
         return True
 
     def _get_message_broker(self):
         try:
-            r=requests.get(catalogURL)
+            r=requests.get(self.catalogURL)
         except requests.exceptions.RequestException as e:
             return False
         data=json.loads(r.content)
@@ -64,8 +69,13 @@ class MQTTPublisher():
             #NON DOVREBBERO ESSERE TUTTI GLI ENDPOINTS (?)
             key=service['description']
             self.topics[key]=[]
+
+            eps=[]
             for ep in service['endpoints']:
-                self.topics.append(json.loads(ep))
+                eps.append(json.loads(ep))
+            for ep in eps:
+                if ep['description'] in self.__useful_topics:
+                    self.topics[ep['description']]=ep.value
             
         return True
 
@@ -88,7 +98,7 @@ class MQTTPublisher():
     #punto 1
     def actuate_fan(self, value):
         #TODO: sistemare le chiavi 
-        topic=self.topics['fan'][]
+        topic=self.topics['fan']
         value=int(value)
         if value <0 or value >255:
             return False
@@ -96,7 +106,7 @@ class MQTTPublisher():
                 "e":[
                 {
                     "n":"fan",
-                    "t":time.time()
+                    "t":time.time(),
                     "v":value,
                     "u":None
                 }
@@ -106,16 +116,16 @@ class MQTTPublisher():
         return True
 
     #punto 2
-    def actuate_led(self, value):
-        topic=self.topics['led'][]
+    def actuate_heating(self, value):
+        topic=self.topics['heating']
         value=int(value)
         if value <0 or value >255:
             return False
         message={"bn":self.ID,
                 "e":[
                 {
-                    "n":"led",
-                    "t":time.time()
+                    "n":"heating",
+                    "t":time.time(),
                     "v":value,
                     "u":None
                 }
@@ -139,49 +149,49 @@ class MQTTPublisher():
     def change_set_points(self, min_fan=None, max_fan=None, min_led=None, max_led=None):
         #cambia solo i setpoint effettivamente ricevuti
         #NB: PASSARE I PARAMETRI NELLA FORMA KEY=VALUE PER EVITARE DI RISPETTARE L'ORDINE DEI PARAMETRI
-        topic=self.topics['setpoints'][]
-        if min_fan not None:
+        topic=self.topics['setpoints']
+        if min_fan is not None:
             message={"bn":self.ID,
                     "e":[
                     {
                         "n":"led",
-                        "t":time.time()
+                        "t":time.time(),
                         "v":min_fan,
                         "u":None
                     }   
                 ]
             }
             self._publish(topic, json.dumps(message))
-        if max_fan not None:
+        if max_fan is not None:
             message={"bn":self.ID,
                     "e":[
                     {
                         "n":"led",
-                        "t":time.time()
+                        "t":time.time(),
                         "v":max_fan,
                         "u":None
                     }   
                 ]
             }
             self._publish(topic, json.dumps(message))
-        if min_led not None:
+        if min_led is not None:
             message={"bn":self.ID,
                     "e":[
                     {
                         "n":"led",
-                        "t":time.time()
+                        "t":time.time(),
                         "v":min_led,
                         "u":None
                     }   
                 ]
             }
             self._publish(topic, json.dumps(message))
-        if max_led not None:
+        if max_led is not None:
             message={"bn":self.ID,
                     "e":[
                     {
                         "n":"led",
-                        "t":time.time()
+                        "t":time.time(),
                         "v":max_led,
                         "u":None
                     }   
@@ -189,3 +199,10 @@ class MQTTPublisher():
             }
             self._publish(topic, json.dumps(message))
 
+
+def main():
+    client=MQTTPublisher('myID','http://localhost')
+    print(client)
+
+if __name__ == '__main__':
+    main()

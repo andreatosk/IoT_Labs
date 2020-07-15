@@ -4,8 +4,8 @@ import requests
 
 class MQTTSubscriber():
     def __init__(self, ID, catalogURL):
-        self._ID=ID
-        self._description='subscriber'
+        self.ID=ID
+        self.description='subscriber'
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
@@ -15,21 +15,23 @@ class MQTTSubscriber():
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
 
-
         #registro al catalogo
         success=self._register()
         if not success:
-            return("Failed to register to catalog.")
+            print("Failed to register to catalog.")
+            return
 
         # ottengo info dal catalogo:
         success=self._get_message_broker()
         if not success:
-            return("Failed to retrieve Message Broker info.")
+            print("Failed to retrieve Message Broker info.")
+            return
 
         #ottengo gli endpoints dal catalogo
         success=self._get_topics()
         if not success:
-            return("Failed to retrieve endpoints.")
+            print("Failed to retrieve endpoints.")
+            return
         
 
         self.start()
@@ -38,13 +40,14 @@ class MQTTSubscriber():
         myself={}
         jdict={}
         jdict['service_id']=self.ID
-        jdict['description']=self._description
+        jdict['description']=self.description
         jdict['endpoints']=[]
         myself[self.ID]=jdict
 
         try:
-            r=requests.put(catalogURL, json.dumps(myself))
+            r=requests.put(self.catalogURL, json.dumps(myself))
         except requests.exceptions.RequestException as e:
+            print(e)
             return False
 
         return True
@@ -54,6 +57,9 @@ class MQTTSubscriber():
             r=requests.get(self.catalogURL)
         except requests.exceptions.RequestException as e:
             return False
+        if r.content is not None:
+            print(r.content)
+            exit(1)
         data=json.loads(r.content)
         self.broker=data['ip_address']
         self.port=data['port']
@@ -72,7 +78,7 @@ class MQTTSubscriber():
             return False
         services=r.content
         for s_ID, service in services.items():
-            if service['description']=='temperature'
+            if service['description']=='temperature':
                 self.topics.extend(service['endpoints'])
         return True
 
@@ -93,3 +99,11 @@ class MQTTSubscriber():
         data=json.loads(msg.payload)
         print(f"Received data from {data['bn']}:")
         print(f"{data['e']['n']}: {data['e']['v']:.3}{data['e']['u']}")
+
+
+def main():
+    client=MQTTSubscriber('myID', 'http://0.0.0.0')
+
+
+if __name__ == '__main__':
+    main()
