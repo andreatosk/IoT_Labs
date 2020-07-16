@@ -2,7 +2,7 @@ from MQTT import Moquette
 import json
 import requests
 
-class MQTTPublisher():
+class Control():
     def __init__(self, ID, catalogURL):
         self.ID=ID
         self.description="publisher"
@@ -181,7 +181,7 @@ class MQTTPublisher():
 
 
 def main():
-    client=MQTTPublisher('myID','http://localhost')
+    client=Control('myID','http://localhost')
     print(client)
 
 if __name__ == '__main__':
