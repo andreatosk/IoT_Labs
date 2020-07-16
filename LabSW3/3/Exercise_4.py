@@ -72,20 +72,11 @@ class MQTTPublisher():
                 if ep['description'] in self.__useful_topics:
                     self.topics[ep['description']]=ep['value']
             
-    def _publish(self, topic, payload):
-        self._mqtt.publish(topic, payload, qos=2)
-
-    def _subscribe(self, topic):
-        if not self.__isSub:
-            self._mqtt.subscribe(topic, qos=2)
-            self.__isSub=True
-
-    def on_message(self, client, userdata, msg):
-        if msg.topic.split('/')[-1]=='people':
-            self.sense_people(msg.payload)
-
     def start(self):
         self._mqtt.start()
+
+    def stop(self):
+        self._mqtt.stop()
 
 
     #punto 1
