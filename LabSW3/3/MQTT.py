@@ -11,7 +11,6 @@ class Moquette:
 
         self.__mqtt=moquette.Client(self.ID, False)
         self.__mqtt.on_message=self.on_message
-        self.__mqtt.on_connect=self.on_connect
 
         self.__is_sub={}
         for descr, topic in self.__topics.items():
@@ -42,6 +41,3 @@ class Moquette:
 
     def on_message(self, client, userdata, msg):
         self.frontend.sense_people(msg.payload)
-
-    def on_connect(self, client, userdata, flags, rc):
-        pass
