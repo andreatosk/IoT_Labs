@@ -41,7 +41,7 @@ class Moquette:
 
 
     def on_message(self, client, userdata, msg):
-        pass
+        self.notifier.sense_people(msg.payload)
 
     def on_connect(self, client, userdata, flags, rc):
         pass
