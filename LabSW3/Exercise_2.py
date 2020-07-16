@@ -16,22 +16,25 @@ class MQTTSubscriber():
         self._mqtt.on_message=self.on_message
 
         #registro al catalogo
-        success=self._register()
-        if not success:
-            print("Failed to register to catalog.")
-            return
+        try:
+            self._register()
+        except Exception as e:
+            #print("Failed to register to catalog.")
+            raise e
 
         # ottengo info dal catalogo:
-        success=self._get_message_broker()
-        if not success:
-            print("Failed to retrieve Message Broker info.")
-            return
+        try:
+            self._get_message_broker()
+        except Exception as e:
+            #print("Failed to retrieve Message Broker info.")
+            raise e
 
         #ottengo gli endpoints dal catalogo
-        success=self._get_topics()
-        if not success:
-            print("Failed to retrieve endpoints.")
-            return
+        try:
+            self._get_topics()
+        except Exception as e:
+            #print("Failed to retrieve endpoints.")
+            raise e
         
 
         self.start()
@@ -47,19 +50,15 @@ class MQTTSubscriber():
         try:
             r=requests.put(self.catalogURL, json.dumps(myself))
         except requests.exceptions.RequestException as e:
-            print(e)
-            return False
+            #print(e)
+            raise e
 
-        return True
 
     def _get_message_broker(self):
         try:
             r=requests.get(self.catalogURL)
         except requests.exceptions.RequestException as e:
-            return False
-        if r.content is not None:
-            print(r.content)
-            exit(1)
+            raise e
         data=json.loads(r.content)
         self.broker=data['ip_address']
         self.port=data['port']
@@ -68,19 +67,17 @@ class MQTTSubscriber():
         # - [0]:/devices
         # - [1]:/users
         # - [2]:/services
-        return True
 
     def _get_topics(self):
         #la post senza parametri mi ritorna tutti i services del catalogo
         try:
             r=requests.post(self.catalogURL)
         except requests.exceptions.RequestException as e:
-            return False
+            raise e
         services=r.content
         for s_ID, service in services.items():
             if service['description']=='temperature':
                 self.topics.extend(service['endpoints'])
-        return True
 
 
     def start(self):
