@@ -10,8 +10,8 @@ def get_position(ipaddress=''):
     #viene interrogato
     global APIserver
     url=APIserver+'json/'+ipaddress+'?fields=status,lon,lat'
-    #mi interessano status=['success'|'fail']
-    #               lon, lat = float
+    #mi interessano status = [ 'success' | 'fail' ]
+    #               lon, lat : float
 
     try:
         r=requests.get(url)
@@ -21,8 +21,9 @@ def get_position(ipaddress=''):
     
     data=json.loads(r.content)
     if data["status"] != 'success':
-        #errore
-        pass
+        #errore del server 'ip-api'
+        #posso gestirlo come un errore di connessione
+        return False
 
 
     #success

@@ -1,6 +1,8 @@
 import requests
 import json
+import time
 from position import get_position
+
 
 weather_server='http://www.7timer.info/bin/civil.php'
 
@@ -39,8 +41,9 @@ def get_weather(jdict, ipaddress=''):
     #SOLO PER IL DEBUG
     params=get_position(ipaddress)
     while(type(params)==type(True) and not params):
-        #qualcosa è andato storto, riprovo
-        params=get_position()
+        #qualcosa è andato storto, riprovo tra due secondi
+        time.sleep(2)
+        params=get_position(ipaddress)
 
 
 
