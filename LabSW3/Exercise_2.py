@@ -11,7 +11,7 @@ class MQTTSubscriber():
         self.port=None
         self.__paths=[]
         self.topic=None
-
+        self.__is_sub=False
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
 
@@ -92,10 +92,18 @@ class MQTTSubscriber():
         self.subscribe()
 
     def subscribe(self):
-        tuples=[]
-        for topic in self.topics:
-            tuples.append((topic, 2))
-        self._mqtt.subscribe(tuples)
+        self._mqtt.subscribe(self.topic, qos=2)
+        self.__is_sub=True
+
+    def unsubscribe(self):
+        if self.__is_sub:
+            self._mqtt.unsubscribe(self.topic)
+        self.__is_sub=False
+
+    def stop(self):
+        self.unsubscribe()
+        self._mqtt.loop_stop()
+        self._mqtt.disconnect()
 
 
     def on_message(self, client, userdata, msg):

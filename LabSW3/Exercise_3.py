@@ -86,6 +86,10 @@ class MQTTPublisher():
         self._mqtt.connect(self.broker, self.port)
         self._mqtt.loop_start()
 
+    def stop(self):
+        self._mqtt.loop_stop()
+        self._mqtt.disconnect()
+
     def switch_LED(self, state):
         if type(state) != type(True):
             #errore: state può essere solo booleano
