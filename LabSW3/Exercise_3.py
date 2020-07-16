@@ -72,11 +72,15 @@ class MQTTPublisher():
             raise e
         services=r.content
         for s_ID, service in services.items():
-            if service['description']=='led':
-                for ep in service['endpoints']:
-                    self.endpoints.append(json.loads(ep))
 
-                self.topics.extend(service['endpoints'])
+            eps=[]
+            for ep in service['endpoints']:
+                eps.append(json.loads(ep))
+            for ep in eps:
+                if ep['description'] == 'led' :
+                    #ASSUMO CHE CI SIA UN UNICO ENDPOINT UTILE
+                    self.topic=ep.value
+                    break
 
     def start(self):
         self._mqtt.connect(self.broker, self.port)
@@ -84,7 +88,7 @@ class MQTTPublisher():
 
     def switch_LED(self, state):
         if type(state) != type(True):
-            #errore: il messaggio può essere solo booleano
+            #errore: state può essere solo booleano
             return False
         if state == self.__LED_ON:
             #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
