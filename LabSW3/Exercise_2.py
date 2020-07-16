@@ -10,7 +10,7 @@ class MQTTSubscriber():
         self.broker=None
         self.port=None
         self.__paths=[]
-        self.topics={}
+        self.topic=None
 
         self._mqtt=moquette.Client(self.ID, False)
         self._mqtt.on_message=self.on_message
@@ -76,8 +76,14 @@ class MQTTSubscriber():
             raise e
         services=r.content
         for s_ID, service in services.items():
-            if service['description']=='temperature':
-                self.topics.extend(service['endpoints'])
+            eps=[]
+            for ep in service['endpoints']:
+                eps.append(json.loads(ep))
+            for ep in eps:
+                if ep['description'] == 'temperature':
+                    #ASSUMO CHE CI SIA UN SOLO ENDPOINT UTILE
+                    self.topic=ep['value']
+                    break
 
 
     def start(self):

@@ -11,7 +11,7 @@ class MQTTPublisher():
         self.catalogURL=catalogURL
         self.broker=None
         self.port=None
-        self.topics=[]
+        self.topic=None
 
         # assumo che il led di default sia spento
         self.__LED_ON=False
@@ -79,7 +79,7 @@ class MQTTPublisher():
             for ep in eps:
                 if ep['description'] == 'led' :
                     #ASSUMO CHE CI SIA UN UNICO ENDPOINT UTILE
-                    self.topic=ep.value
+                    self.topic=ep['value']
                     break
 
     def start(self):
