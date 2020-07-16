@@ -94,8 +94,6 @@ class MQTTPublisher():
             #il comando non ha effetto: non serve neanche comunicare il messaggio al broker
             return
 
-        #per il momento assumo che ci sia un solo topic valido
-        topic=self.endpoints[0]
         #PER IL DATAFORMAT DEVO CONOSCERE CHE COSA SI ASPETTA IL CLIENT MQTT SULLA YÙN
         message={"bn":self.ID,
                 "e":[
@@ -108,7 +106,7 @@ class MQTTPublisher():
             ]
         }
         self.__LED_ON=state
-        self._mqtt.publish(topic, json.dumps(message),2)
+        self._mqtt.publish(self.topic, json.dumps(message),2)
 
 def main():
     client=MQTTPublisher('myid', 'http://localhost')
