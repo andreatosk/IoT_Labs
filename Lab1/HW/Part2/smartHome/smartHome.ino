@@ -1,43 +1,65 @@
 //solo pin 7 per interrupt PIR
 //pin 2 e 3 per i2c
-
-
 #include <math.h>
 #include <LiquidCrystal_PCF8574.h>
 
 LiquidCrystal_PCF8574 lcd(0x27);
 
-
+//PINS
 const int tempPin = A1;
 const int fPin = 11;
 const int ledPin = 10;
-const int pirPin = 4;
-const int soundPin = 7;
-//const int testPin = 13;
+const int pirPin = 7;
+const int soundPin = 9;
 
-
+const int maxlen = 10;
 const int timestamp = 2;
 const int timeout_pir = 30000;
 
-const int B = 4275;               // B value of the thermistor
-const long int R0 = 100000;      // R0 = 100k
+//Costanti Temperatura
+const int B = 4275;
+const long int R0 = 100000;
 
-int firstSetPoint = 20;
-int secondSetPoint = 30;
+//setPoint in utilizzo nel presente
 
-int thirdSetPoint = 28;   //condizionamento
-int fourthSetPoint = 18;
 
+
+//Convenzione:
+//c per Condizionamento r per Riscaldamento
+//P per presenza, a per assenza
+//min e max per valori minimi e massimi
+short cpMinSetPoint = 20;   //Condizionamento
+short cpMaxSetPoint = 26;
+
+short rpMinSetPoint = 28;   //Riscaldamento
+short rpMaxSetPoint = 20;
+
+short caMinSetPoint = 24;   //Condizionamento
+short caMaxSetPoint = 30;
+
+short raMinSetPoint = 24;   //Riscaldamento
+short raMaxSetPoint = 16;
+
+short cMinSetPoint = caMinSetPoint;
+short cMaxSetPoint = caMaxSetPoint;
+short rMinSetPoint = raMinSetPoint;
+short rMaxSetPoint = raMaxSetPoint;
 
 volatile int tot_count = 0;
 
-short PIRpresence = 0;
-short Spresence = 0;
-short Ppres = 0;
+//Valori di presenza
+boolean PIRpresence = 0; //infrarossi
+boolean soundPres = 0; //sensore di rumore
+boolean Ppres = 0; //PIRpresence || soundPres
 
-short n_sounds = 0;
-long sound_interval = 600000;
-long timeout_sound = 3600000;
+//Gestione dei suoni
+long sound_interval = 120000; //2 min
+long timeout_sound = 30000; //60 min
+long V[maxlen];
+short start = 0, endl = 0;
+
+
+//Timer per temporizzazione
 int t, tto;
 long int timer;
 int timerMult = 0;
@@ -46,13 +68,23 @@ int lcd_timer;
 
 long t1; //timer casuali
 
+//flag per gestire il cambio dei setPoint
 short changed = 0;
 
+//Utilizzo risorse
 float temperature;
 int percFan;
 int percLed;
 
-//DA MODIFICARE
+//Input
+char inputC;
+int i;
+int v[4];
+boolean changingVal = 0;
+char choice;
+
+
+
 void PIRcheckPresence() {
   PIRpresence = !PIRpresence;
   if (PIRpresence == 1) {
@@ -67,62 +99,49 @@ void resetTimers() {
   timerMult = 0;
 }
 
-//SOUND CON ISR
 
-void ScheckPresence() {
-  if (((t1 - timer) >= (timerMult * 1000))) { //Ogni secondo monitoro se ci sono eventi sonori
-    if (n_sounds = 0) {
-      t = millis();
+
+void soundOccurrence() {
+  if (digitalRead(soundPin) == LOW  && ((t1 - timer) >= (timerMult * 500))) {
+    V[endl] = millis();
+    endl++;
+
+    start = start % (maxlen - 1);
+
+
+    if (abs(endl - start) == (maxlen - 1) && ( V[endl] - V[start] < sound_interval)) {
+      soundPres = 1;
+      tto = millis();
+      Serial.println((V[endl] - V[start]) / 1000);
     }
-    tto = millis();
-    n_sounds += 1;
-    if (n_sounds >= 50 && t < sound_interval) {
-      Spresence = 1;
-      n_sounds = 0;
-      resetTimers();
+
+    if (endl > (maxlen - 1)) {
+      endl = 0;
     }
-    timerMult += 1;
+
+
+    if (start >= endl)
+      start++;
+
+    if (endl == start - 1) {
+      if (V[endl] - V[start] < sound_interval)
+        soundPres = 1;
+      tto = millis();
+    }
   }
-  if (tto >= timeout_sound) {
-    Spresence = 0;
-    resetTimers();
+
+  else {
+
+    if (tto > timeout_sound && soundPres == 1) {
+      soundPres = 0;
+    }
   }
+
 }
 
 
-/*
-  void ScheckPresence(){
-  if(digitalRead(soundPin)==HIGH && ((t1-timer) >= (timerMult*1000))){    //Ogni secondo monitoro se ci sono eventi sonori
-    if(n_sounds=0){
-      t = millis();
-    }
-     tto = millis();
-     n_sounds+=1;
-     if(n_sounds>=50 && t<sound_interval){
-        Spresence=1;
-        n_sounds = 0;
-        resetTimers();
-      }
-      timerMult+=1;
-  }
-  if(tto>= timeout_sound){
-    Spresence = 0;
-    resetTimers();
-  }
-  }
-*/
-/*
-  void test(){
-  if(digitalRead(testPin)==HIGH){
-    Spresence = 1;
-  }
-  else
-    Spresence = 0;
-  }
-*/
-
 float tempCalc() {
-  delay(timestamp * 1000);
+  delay(timestamp * 500);
   int a = analogRead(tempPin);
   float R = 1023.0 / ((float)a) - 1.0;
 
@@ -137,24 +156,24 @@ float tempCalc() {
 double tempMap(float val) {
   //a = first b = sec
   //c = 0 d = 255
-  //double R = (val-firstSetPoint)/(secondSetPoint-firstSetPoint);
+  //double R = (val-cpMinSetPoint)/(cpMaxSetPoint-cpMinSetPoint);
   //double y = (255*R) ;
-  return map(val, firstSetPoint, secondSetPoint, 0, 255);
+  return map(val, cpMinSetPoint, cpMaxSetPoint, 0, 255);
 }
 
 double tempMapLed(float val) {
   //a = third, b = fourth
   //c = 0 d = 255
-  //double R = (val-thirdSetPoint)/(thirdSetPoint-fourthSetPoint);
+  //double R = (val-rpMinSetPoint)/(rpMinSetPoint-rpMaxSetPoint);
   //double y = (255*R) ;
-  return map(val, fourthSetPoint, thirdSetPoint, 0, 255);
+  return map(val, rpMaxSetPoint, rpMinSetPoint, 0, 255);
 }
 
 //Voglio che il condizionatore sia mappato tra i valori del primo e secondo set point:
 //first:second = 0:255
 
 float tempRegulator(float currentTemp) {
-  int c = (int)tempMap(currentTemp); //da levare
+  int c = (int)tempMap(currentTemp); 
   if (c >= 255)
     c = 255;
   else if (c <= 0)
@@ -179,33 +198,31 @@ float tempRegulator(float currentTemp) {
   */
 }
 
+
+//TODO: Aggiungere il ritorno a 0
 void switchP() {
-  if (PIRpresence || Spresence) {
+  if (PIRpresence || soundPres) {
     Ppres = 1;
     if (changed == 0) {
-      firstSetPoint = 20;
-      secondSetPoint = 24;
+      cpMinSetPoint = caMinSetPoint;
+      cpMaxSetPoint = caMaxSetPoint;
+      rpMinSetPoint = raMinSetPoint;
+      rpMaxSetPoint = raMaxSetPoint;
       changed = 1;
 
       Serial.println("Modalità comfort.");
-      Serial.print("Attuali setPoint: (");
-      Serial.print(firstSetPoint);
-      Serial.print(",");
-      Serial.print(secondSetPoint);
-      Serial.println(")");
+      printSetPoint();
     }
-    if (!PIRpresence && !Spresence) {
+    if (!PIRpresence && !soundPres) {
       Ppres = 0;
       if (changed == 0) {
-        firstSetPoint = 20;
-        secondSetPoint = 30;
+        cpMinSetPoint = caMinSetPoint;
+        cpMaxSetPoint = caMaxSetPoint;
+        rpMinSetPoint = raMinSetPoint;
+        rpMaxSetPoint = raMaxSetPoint;
         changed = 1;
         Serial.println("Modalità mantenimento.");
-        Serial.print("Attuali setPoint: (");
-        Serial.print(firstSetPoint);
-        Serial.print(",");
-        Serial.print(secondSetPoint);
-        Serial.println(")");
+        printSetPoint();
       }
     }
   }
@@ -213,38 +230,152 @@ void switchP() {
 
 
 void lcdShow() {
-  /*
-    lcd.clear();
-    lcd.print("T:");
-    lcd.print(temperature);
-    lcd.print(" Pres:");
-    lcd.print(Ppres);
-    lcd.setCursor(0, 1);
-    lcd.print("AC:");
-    lcd.print(percFan);
-    lcd.print("% HT:");
-    lcd.print(percLed);
-    lcd.print("%  ");
 
-    lcd_timer = (timer-t1)/1000;
-    Serial.println(timer);
-    Serial.println(t1);
-    if(lcd_timer%2 == 0){
+  lcd.clear();
+  lcd.print("T:");
+  lcd.print(temperature);
+  lcd.print(" Pres:");
+  lcd.print(Ppres);
+  lcd.setCursor(0, 1);
+  lcd.print("AC:");
+  lcd.print(percFan);
+  lcd.print("% HT:");
+  lcd.print(percLed);
+  lcd.print("%  ");
+
+  lcd_timer = (timer - t1) / 1000;
+  Serial.println(timer);
+  Serial.println(t1);
+
+  if (lcd_timer % 2 == 0) {
 
     lcd.clear();
     lcd.print("AC m:");
-    lcd.print(firstSetPoint);
+    lcd.print(cpMinSetPoint);
     lcd.print(" M:");
-    lcd.print(secondSetPoint);
+    lcd.print(cpMaxSetPoint);
     lcd.setCursor(0, 1);
     lcd.print("HT m:");
-    lcd.print(thirdSetPoint);
+    lcd.print(rpMinSetPoint);
     lcd.print(" M:");
-    lcd.print(fourthSetPoint);
+    lcd.print(rpMaxSetPoint);
+  }
+
+  Serial.println("Rumore");
+}
+
+//Svuota il buffer di input
+void Serialfree() {
+  while (Serial.available())
+    Serial.read();
+}
+
+void printSetPoint() {
+  Serial.println("Attuali setPoint:"); 
+  Serial.println();
+  Serial.println("A regime:");
+  Serial.println("Condizionamento:");
+  Serial.print("(");
+  Serial.print(cpMinSetPoint);
+  Serial.print(",");
+  Serial.print(cpMaxSetPoint);
+  Serial.println(")");
+
+
+  Serial.println("Riscaldamento");
+  Serial.print("(");
+  Serial.print(rpMinSetPoint);
+  Serial.print(",");
+  Serial.print(rpMaxSetPoint);
+  Serial.println(")");  
+  
+  Serial.println();
+  Serial.println("A risparmio energetico:");
+  Serial.println("Condizionamento:");
+  Serial.print("(");
+  Serial.print(caMinSetPoint);
+  Serial.print(",");
+  Serial.print(caMaxSetPoint);
+  Serial.println(")");
+
+
+  Serial.println("Riscaldamento");
+  Serial.print("(");
+  Serial.print(raMinSetPoint);
+  Serial.print(",");
+  Serial.print(raMaxSetPoint);
+  Serial.println(")");
+  Serial.println();
+  
+}
+
+void printCurrentSetPoint(){
+  Serial.println("Attuali setPoint in utilizzo:"); 
+  Serial.println();
+  
+  Serial.println("Condizionamento:");
+  Serial.print("(");
+  Serial.print(cMinSetPoint);
+  Serial.print(",");
+  Serial.print(cMaxSetPoint);
+  Serial.println(")");
+
+
+  Serial.println("Riscaldamento");
+  Serial.print("(");
+  Serial.print(rMinSetPoint);
+  Serial.print(",");
+  Serial.print(rMaxSetPoint);
+  Serial.println(")");  
+  Serial.println();
+  
+}
+
+void checkInput() {
+  printSetPoint();
+
+  Serial.println("Inserire 1 o 2 se si vogliono rispettivamente modificare i valori a regime o i valori a risparmio energetico");
+  Serialfree();
+  while(!Serial.available());
+  choice = Serial.peek();
+  Serialfree();
+  
+  Serial.println("Inserire in ordine da 1 a 4 i valori di minCond, maxCond, minRisc, maxRisc");
+  Serialfree();
+  while (true) {
+    changingVal = 1;
+    int i = 0;
+    while (i < 4) {
+      Serial.print("Inserisci il ");
+      Serial.println(i + 1);
+      Serial.read();
+      Serial.read();
+      while (Serial.available() == 0);
+      v[i] = Serial.parseInt();
+      i++;
     }
-  */
-  lcd.clear();
-  lcd.print("Rumore");
+
+    if(choice == '1'){
+      cpMinSetPoint = v[0];
+      cpMaxSetPoint = v[1];
+      rpMinSetPoint = v[2];
+      rpMaxSetPoint = v[3];
+     }
+    if(choice == '2'){
+      caMinSetPoint = v[0];
+      caMaxSetPoint = v[1];
+      raMinSetPoint = v[2];
+      raMaxSetPoint = v[3];
+     }
+
+    if (i == 4)
+      break;
+
+    if (Serial.available() && Serial.peek() == '-')
+      break;
+  }
+  printSetPoint();
+  changingVal = 0;
 }
 
 void setup() {
@@ -254,34 +385,35 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(pirPin, INPUT);
   pinMode(soundPin, INPUT);
+
   //  pinMode(testPin,INPUT); //DEBUGGING
-  attachInterrupt(digitalPinToInterrupt(soundPin), lcdShow, CHANGE);
-
-
   while (!Serial);
 
   lcd.begin(16, 2);
   lcd.setBacklight(255);
   lcd.home();
   lcd.clear();
-  //attachInterrupt(digitalPinToInterrupt(pirPin), PIRcheckPresence, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(pirPin), PIRcheckPresence, CHANGE);
+  printCurrentSetPoint();
 
-  Serial.print("Attuali setPoint: (");
-  Serial.print(firstSetPoint);
-  Serial.print(",");
-  Serial.print(secondSetPoint);
-  Serial.println(")");
-
+  Serial.println("Inserire il carattere + se si vuole inserire dei setPoint diversi.");
   timer = millis();
 }
 
 void loop() {
-  t1 = millis();
-  tempRegulator(tempCalc());
-  ScheckPresence();
-  switchP();
-  Serial.print("N sounds: ");
-  Serial.println(n_sounds);
-  //test();
-  //lcdShow();
+  if (!changingVal) {
+    t1 = millis();
+    
+    switchP();
+    tempRegulator(tempCalc());
+    soundOccurrence();
+
+
+    //test();
+    lcdShow();
+  }
+  if (Serial.available() > 0 && Serial.peek() == '+') {
+    Serialfree();
+    checkInput();
+  }
 }
