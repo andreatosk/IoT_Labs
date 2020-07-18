@@ -122,10 +122,10 @@ Users
 Weather
 ```json
 {
-  "temperature":"value + 'Cel'",
+  "temperature":"value + ' deg Cel'",
   "wind":"value + 'm/s' + direction",
   "weather":"current_weather",
-  "humidity":"value + '%'"
+  "humidity":"'humidity' value + '%'"
 }
 ```
 

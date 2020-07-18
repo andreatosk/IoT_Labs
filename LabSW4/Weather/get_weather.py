@@ -29,7 +29,7 @@ def convert_data(row_data, jdict):
         else:
             clean_data[key]['weather']=jdict['prec_type'][data['prec_type']]+' '+jdict['prec_amount']['values'][str(data['prec_amount'])]+jdict['prec_amount']['unit']
         #humidity
-        clean_data[key]['humidity']=data['rh2m']
+        clean_data[key]['humidity']='humidity '+data['rh2m']
 
     return clean_data
 
