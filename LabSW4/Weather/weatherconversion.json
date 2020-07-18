@@ -25,8 +25,8 @@
     "prec_type": {
         "snow": "snow",
         "rain": "rain",
-        "frzr": "freezing rain",
-        "icep": "ice pellets"
+        "frzr": "sleet",
+        "icep": "hail"
     },
     "prec_amount": {
         "values": {
@@ -40,6 +40,6 @@
             "7": "50-75",
             "8": ">75"
         },
-        "unit": "mm/hr"
+        "unit": "mm/h"
     }
 }

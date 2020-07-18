@@ -13,21 +13,21 @@ def convert_data(row_data, jdict):
         key=str((base_time+int(data['timepoint']))%24)
         clean_data[key]={}
         #temperature
-        clean_data[key]['temperature']=str(data['temp2m'])+'Cel'
+        clean_data[key]['temperature']=str(data['temp2m'])+' deg Cel'
         #wind
         clean_data[key]['wind']=jdict['wind10m']['values'][str(data['wind10m']['speed'])]+jdict['wind10m']['unit']+', '+data['wind10m']['direction']
         #weather
         if data['prec_type'] not in jdict['prec_type'].keys():
             cc=int(data['cloudcover'])
             wstr=jdict['hour'][key]
-            if cc <= 3:
+            if cc < 5:
                 clean_data[key]['weather']='clear '+wstr
-            elif cc >3 and cc <=7:
-                clean_data[key]['weather']='part. cloudy '+wstr
+            #elif cc >3 and cc <=7:
+            #    clean_data[key]['weather']='part. cloudy '+wstr
             else:
                 clean_data[key]['weather']='cloudy '+wstr
         else:
-            clean_data[key]['weather']=jdict['prec_type'][data['prec_type']]+': '+jdict['prec_amount']['values'][str(data['prec_amount'])]+jdict['prec_amount']['unit']
+            clean_data[key]['weather']=jdict['prec_type'][data['prec_type']]+' '+jdict['prec_amount']['values'][str(data['prec_amount'])]+jdict['prec_amount']['unit']
         #humidity
         clean_data[key]['humidity']=data['rh2m']
 
