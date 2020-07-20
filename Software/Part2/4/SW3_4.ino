@@ -184,7 +184,8 @@ void interact(const String& topic, const String& subtopic, const String& message
 void catalogRegister(){
 
     //Faccio la registrazione
-    //PARTE MANCANTE PER GESTIONE DI JSON ASSENTE
+    /*PARTE MANCANTE PER GESTIONE DI JSON ASSENTE: v. nella sezione 'Hardware' della relazione, 
+    paragrafo 'GESTIONE DELLA (RI)CONNESSIONE'*/
 
 
     //Faccio una curl al catalog
