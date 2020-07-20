@@ -162,6 +162,19 @@ String my_curlPOST(){
     return(p.readString());
 }
 
+int my_curlPUT(String data){
+  Process p;
+
+  p.begin("curl");
+  p.addParameter("http://127.0.0.1/8080/devices");
+  p.addParameter("--request");
+  p.addParameter("PUT");
+  p.addParameter("--data");
+  p.addParameter(data);
+  p.run();
+  return(p.exitValue());
+}
+
 
 void stampaMqtt(const String& topic, const String& subtopic, const String& message) {
 
@@ -187,9 +200,16 @@ void catalogRegister(){
     /*PARTE MANCANTE PER GESTIONE DI JSON ASSENTE: v. nella sezione 'Hardware' della relazione, 
     paragrafo 'GESTIONE DELLA (RI)CONNESSIONE'*/
 
-
+    strcpy(json, "{\"device_id\":\"arduino\",\"resources\":[\"temperature\",\"led\",\"heating\",\"fan\",\"setpoints\",\"people\"],\"endpoints\":[\"/tiot/18/temperature\",\"/tiot/18/led\",\"/tiot/18/heating\",\"/tiot/18/fan\",\"/tiot/18/setpoints\",\"/tiot/18/people\"]}");
+    retcode=my_curlPUT(json);
+    if(retcode >= 400){
+      //errore
+      exit(EXIT_FAILURE)
+    }
     //Faccio una curl al catalog
     //ottengo il broker
+
+    
     
     //Curl per la GET
     String dataBroker = my_curlGET();
