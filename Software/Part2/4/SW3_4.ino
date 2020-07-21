@@ -571,7 +571,8 @@ void loop() {
   }
 
   //invio in documento json serializzato contenente temerature,info su presenze e rumori
-  //PARTE MANCANTE PER GESTIONE DI JSON ASSENTE
+    /*PARTE MANCANTE PER GESTIONE DI JSON ASSENTE: v. nella sezione 'Hardware' della relazione, 
+    paragrafo 'GESTIONE DELLA (RI)CONNESSIONE'*/
   //nessun temperatureData
   mymqtt.publish("tiot/18/temperature",temperatureData);
   delay(5000);
